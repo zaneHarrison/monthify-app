@@ -8,6 +8,10 @@ module.exports = () => {
         source: "/api",
         destination: "http://localhost:5001/api",
       },
+      {
+        source: "/login",
+        destination: "http://localhost:5001/login",
+      },
     ];
   };
   return {
