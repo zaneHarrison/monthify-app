@@ -1,10 +1,12 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, Request, Response, query } from "express";
 import dotenv from "dotenv";
 import { generateRandomString } from "./utils/helperFunctions";
+import { AxiosError, AxiosResponse } from "axios";
 
 dotenv.config({ path: "../config.env" });
 
 const querystring = require('querystring');
+const axios = require('axios');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -34,6 +36,34 @@ app.get("/login", (req: Request, res: Response) => {
   });
 
   res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
+});
+
+app.get('/callback', (req: Request, res: Response) => {
+  const code = req.query.code || null;
+
+  axios({
+    method: 'post',
+    url: 'https://accounts.spotify.com/api/token',
+    data: querystring.stringify({
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: REDIRECT_URI
+    }),
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+    },
+  })
+    .then((response: AxiosResponse) => {
+      if (response.status === 200) {
+        res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+      } else {
+        res.send(response);
+      }
+    }) 
+    .catch((error: AxiosError) => {
+      res.send(error);
+    });
 });
 
 app.listen(port, () => {

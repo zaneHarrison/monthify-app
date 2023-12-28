@@ -12,6 +12,10 @@ module.exports = () => {
         source: "/login",
         destination: "http://localhost:5001/login",
       },
+      {
+        source: "/callback",
+        destination: "http://localhost:5001/callback",
+      },
     ];
   };
   return {
