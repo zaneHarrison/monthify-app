@@ -35,12 +35,14 @@ app.get("/login", (req: Request, res: Response) => {
     scope: scope,
   });
 
+  console.log("Prompting user to authorize access to Spotify account");
   res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
 });
 
 app.get('/callback', (req: Request, res: Response) => {
   const code = req.query.code || null;
 
+  console.log("Retrieving access and refresh tokens");
   axios({
     method: 'post',
     url: 'https://accounts.spotify.com/api/token',
@@ -56,10 +58,44 @@ app.get('/callback', (req: Request, res: Response) => {
   })
     .then((response: AxiosResponse) => {
       if (response.status === 200) {
-        res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+
+        const { refresh_token } = response.data;
+
+        axios.get(`http://localhost:3000/refresh_token?refresh_token=${refresh_token}`)
+          .then((response: AxiosResponse) => {
+            res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+          })
+          .catch((error: AxiosError) => {
+            res.send(error);
+          });
+
       } else {
         res.send(response);
       }
+    })
+    .catch((error: AxiosError) => {
+      res.send(error);
+    });
+});
+
+app.get('/refresh_token', (req: Request, res: Response) => {
+  const { refresh_token } = req.query;
+
+  console.log("Refreshing access token");
+  axios({
+    method: 'post',
+    url: 'https://accounts.spotify.com/api/token',
+    data: querystring.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    }),
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+    },
+  })
+    .then((response: AxiosResponse) => {
+      res.send(response.data);
     }) 
     .catch((error: AxiosError) => {
       res.send(error);

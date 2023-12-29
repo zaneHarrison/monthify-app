@@ -16,6 +16,10 @@ module.exports = () => {
         source: "/callback",
         destination: "http://localhost:5001/callback",
       },
+      {
+        source: "/refresh_token",
+        destination: "http://localhost:5001/refresh_token",
+      },
     ];
   };
   return {
