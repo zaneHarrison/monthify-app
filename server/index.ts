@@ -15,10 +15,6 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 const app: Express = express();
 const port = parseInt(process.env.SERVER_PORT || "", 10);
 
-app.get("/api", (req: Request, res: Response) => {
-  res.json({ users: ["Tabitha", "is", "fart"] });
-});
-
 const stateKey = 'spotify_auth_state';
 
 app.get("/login", (req: Request, res: Response) => {
