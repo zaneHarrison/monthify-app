@@ -17,6 +17,10 @@ const port = parseInt(process.env.SERVER_PORT || "", 10);
 
 const stateKey = 'spotify_auth_state';
 
+app.listen(port, () => {
+  console.log(`Server started on port ${port}`);
+});
+
 app.get("/login", (req: Request, res: Response) => {
   const state = generateRandomString(16);
   res.cookie(stateKey, state);
@@ -98,6 +102,3 @@ app.get('/refresh_token', (req: Request, res: Response) => {
     });
 });
 
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
-});
