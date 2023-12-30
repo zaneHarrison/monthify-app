@@ -1,12 +1,12 @@
 import express, { Express, Request, Response, query } from "express";
 import dotenv from "dotenv";
-import { generateRandomString } from "./utils/helperFunctions";
+import { generateRandomString } from "./utils/helperFunctions.js";
+import querystring from "querystring";
+import axios from "axios";
 import { AxiosError, AxiosResponse } from "axios";
 
 dotenv.config({ path: "../config.env" });
 
-const querystring = require('querystring');
-const axios = require('axios');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -40,7 +40,7 @@ app.get("/login", (req: Request, res: Response) => {
 });
 
 app.get('/callback', (req: Request, res: Response) => {
-  const code = req.query.code || null;
+  const code = req.query.code as string || null;
 
   console.log("Retrieving access and refresh tokens");
   axios({
@@ -79,7 +79,7 @@ app.get('/callback', (req: Request, res: Response) => {
 });
 
 app.get('/refresh_token', (req: Request, res: Response) => {
-  const { refresh_token } = req.query;
+  const refresh_token: string | undefined = typeof req.query.refresh_token === 'string' ? req.query.refresh_token : undefined;
 
   console.log("Refreshing access token");
   axios({

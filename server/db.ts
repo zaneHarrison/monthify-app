@@ -1,7 +1,7 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 dotenv.config({ path: "../config.env" });
 
-const mysql = require("mysql2");
+import mysql, { RowDataPacket } from "mysql2";
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -23,10 +23,10 @@ async function getUsers() {
 
 async function getUser(id: number) {
     try {
-        const [rows] = await pool.query(`
+        const [rows] = await pool.query<RowDataPacket[]>(`
         SELECT *
         FROM users
-        WHERE id = ?
+        WHERE user_id = ?
         `, [id]);
         console.log(rows[0]);
         return rows[0];
