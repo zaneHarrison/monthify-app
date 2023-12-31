@@ -9,32 +9,58 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE,
 }).promise();
 
-async function getUsers() {
+export async function createUser(spotify_username: string, refresh_token: string) {
+    try {
+        await pool.query(`
+        INSERT INTO users (spotify_username, refresh_token)
+        VALUES (?, ?)
+        `, [spotify_username, refresh_token]);
+        console.log(`User with username ${spotify_username} successfully added to database.`)
+    } catch (error) {
+        console.error("Error inserting user into database:", error);
+    } finally {
+        pool.end();
+    }
+}
+
+export async function getUsers() {
     try {
         const [rows] = await pool.query("SELECT * FROM users");
         console.log(rows);
         return rows;
     } catch (error) {
-        console.error("Error querying the database:", error);
+        console.error("Error getting users from database:", error);
     } finally {
         pool.end();
     }
 }
 
-async function getUser(id: number) {
+export async function getUserById(id: number) {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(`
         SELECT *
         FROM users
-        WHERE user_id = ?
+        WHERE id = ?
         `, [id]);
         console.log(rows[0]);
         return rows[0];
     } catch (error) {
-        console.error("Error querying the database:", error);
+        console.error("Error getting user from database:", error);
     } finally {
         pool.end();
     }
 }
 
-getUser(1);
+export async function deleteUser(id: number) {
+    try {
+        await pool.query(`
+        DELETE FROM users
+        WHERE id = ?
+        `, [id]);
+        console.log(`User with id ${id} deleted successfully.`)
+    } catch (error) {
+        console.error(`Error deleting user with id ${id} from database:`, error);
+    } finally {
+        pool.end();
+    }
+}

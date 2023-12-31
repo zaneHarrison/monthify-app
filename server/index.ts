@@ -4,6 +4,7 @@ import { generateRandomString } from "./utils/helperFunctions.js";
 import querystring from "querystring";
 import axios from "axios";
 import { AxiosError, AxiosResponse } from "axios";
+import { createUser, getUsers, getUserById, deleteUser } from "./db.js";
 
 dotenv.config({ path: "../config.env" });
 
