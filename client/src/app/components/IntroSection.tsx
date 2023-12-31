@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 import styles from "../styles/IntroSectionStyles.module.css";
-import { SignUpButton } from "./SignUpButton";
+import Button from "./Button";
 
 const light = localFont({
   src: "../../../fonts/Spotify-Font/Gotham-Light.otf",
@@ -12,7 +12,7 @@ const bold = localFont({
 
 export function IntroSection() {
   return (
-    <div className={styles.container}>
+    <div id="intro-section" className={styles.container}>
       <div id="title-text" className={styles.titleTextContainer}>
         <h1 className={bold.className}>
           Track your monthly
@@ -27,7 +27,7 @@ export function IntroSection() {
           listening activity.
         </p>
       </div>
-      <SignUpButton />
+      <Button className="signUpButton" text="Get Started With Monthify" />
     </div>
   );
 }
