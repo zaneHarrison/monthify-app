@@ -1,4 +1,5 @@
 .signUpButton {
+  margin-top: 50px;
   background-color: #1ed760;
   border: 0;
   border-radius: 50px;
@@ -8,4 +9,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #1e1e1e;
+}
+
+.signUpButton:hover {
+  background-color: #55ff90;
 }
