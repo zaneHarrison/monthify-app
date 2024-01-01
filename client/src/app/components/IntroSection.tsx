@@ -31,7 +31,7 @@ export function IntroSection() {
         target="_self"
         className="signUpButton"
         text="Get Started With Monthify"
-        link="/signed-up"
+        link="/login"
       />
     </div>
   );

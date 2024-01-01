@@ -7,30 +7,40 @@ import { AxiosError, AxiosResponse } from "axios";
 import cookieParser from 'cookie-parser';
 import { createUser, getUsers, getUserById, deleteUser } from "./db.js";
 
+// Enable the use of environment variables
 dotenv.config({ path: "../config.env" });
 
+// Access environment variables stored in .env file
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL;
 
+// Create app, assign backend port
 const app: Express = express();
 const port = parseInt(process.env.SERVER_PORT || "", 10);
 
+// Use variable to track state
 const stateKey = 'spotify_auth_state';
 
+// Add cookieParser middleware to application
 app.use(cookieParser());
 
+// Bind application to port
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
 
+// Login route logic
 app.get("/login", (req: Request, res: Response) => {
+  // Generate state value and store in cookie
   const state = generateRandomString(16);
   res.cookie(stateKey, state);
 
+  // Define authorized access levels for application
   const scope = 'user-read-private user-read-email';
 
+  // Build query string
   const queryParams: string = querystring.stringify({
     client_id: CLIENT_ID,
     response_type: 'code',
@@ -40,20 +50,34 @@ app.get("/login", (req: Request, res: Response) => {
     show_dialog: true
   });
 
+  // Request authorization
   console.log("Prompting user to authorize access to Spotify account");
   res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
 });
 
+
+// Callback route logic
 app.get('/callback', (req: Request, res: Response) => {
+  // Check state equality
   const state = req.query.state as string || null;
   if (state !== req.cookies[stateKey]) {
     console.log("States do not match. Ending authorization flow and redirecting user to error page.");
     res.redirect(`${CLIENT_BASE_URL}/error`);
     return;
   }
+
+  // Redirect user to homepage if they deny authorization
+  const error = req.query.error as string || undefined;
+  if (error) {
+    console.log("Authorization denied. Redirecting user to homepage.")
+    res.redirect(`${CLIENT_BASE_URL}`);
+    return;
+  }
   
+  // Extract code parameter
   const code = req.query.code as string || null;
 
+  // Request access token using code parameter value
   console.log("Retrieving access and refresh tokens");
   axios({
     method: 'post',
@@ -90,7 +114,9 @@ app.get('/callback', (req: Request, res: Response) => {
     });
 });
 
+// Refresh token route
 app.get('/refresh_token', (req: Request, res: Response) => {
+ 
   const refresh_token: string | undefined = typeof req.query.refresh_token === 'string' ? req.query.refresh_token : undefined;
 
   console.log("Retrieving new access token");
