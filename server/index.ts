@@ -93,7 +93,7 @@ app.get('/callback', (req: Request, res: Response) => {
 app.get('/refresh_token', (req: Request, res: Response) => {
   const refresh_token: string | undefined = typeof req.query.refresh_token === 'string' ? req.query.refresh_token : undefined;
 
-  console.log("Refreshing access token");
+  console.log("Retrieving new access token");
   axios({
     method: 'post',
     url: 'https://accounts.spotify.com/api/token',
