@@ -4,19 +4,22 @@ import { generateRandomString } from "./utils/helperFunctions.js";
 import querystring from "querystring";
 import axios from "axios";
 import { AxiosError, AxiosResponse } from "axios";
+import cookieParser from 'cookie-parser';
 import { createUser, getUsers, getUserById, deleteUser } from "./db.js";
 
 dotenv.config({ path: "../config.env" });
 
-
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
+const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL;
 
 const app: Express = express();
 const port = parseInt(process.env.SERVER_PORT || "", 10);
 
 const stateKey = 'spotify_auth_state';
+
+app.use(cookieParser());
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
@@ -42,6 +45,13 @@ app.get("/login", (req: Request, res: Response) => {
 });
 
 app.get('/callback', (req: Request, res: Response) => {
+  const state = req.query.state as string || null;
+  if (state !== req.cookies[stateKey]) {
+    console.log("States do not match. Ending authorization flow and redirecting user to error page.");
+    res.redirect(`${CLIENT_BASE_URL}/error`);
+    return;
+  }
+  
   const code = req.query.code as string || null;
 
   console.log("Retrieving access and refresh tokens");
