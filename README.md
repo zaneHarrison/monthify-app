@@ -7,5 +7,5 @@ The backend consists of a Node.js server running Express as well as a MYSQL data
 Monthify is a personal project created by Zane Harrison.
 
 <p align="center">
-  <img width="460" height="300" src="https://github.com/zaneHarrison/monthify-app/assets/98977195/543f3c79-4f33-4e60-ac9a-41086d8b4d2d">
+  <img width="463" height="646" src="https://github.com/zaneHarrison/monthify-app/assets/98977195/60bf25a4-40dc-4583-b3b1-77e1f2266502">
 </p>
