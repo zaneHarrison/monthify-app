@@ -34,6 +34,7 @@ app.get("/login", (req: Request, res: Response) => {
     redirect_uri: REDIRECT_URI,
     state: state,
     scope: scope,
+    show_dialog: true
   });
 
   console.log("Prompting user to authorize access to Spotify account");

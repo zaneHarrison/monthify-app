@@ -3,7 +3,7 @@ import { LearnMoreSection } from "./components/LearnMoreSection";
 
 function HomePage() {
   return (
-    <main>
+    <main id="main-content">
       <IntroSection />
       <LearnMoreSection />
     </main>

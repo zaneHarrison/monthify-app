@@ -2,7 +2,7 @@
 @media only screen and (max-width: 600px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 100vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -11,19 +11,26 @@
   }
 
   .titleTextContainer {
-    margin-top: 12vh;
+    margin-top: 22vh;
     width: 75vw;
-    font-size: 14px;
+    font-size: 15px;
     text-align: center;
     line-height: 1.25;
   }
 
-  .introTextContainer {
-    margin-top: 2vh;
-    width: 50vw;
-    font-size: 13px;
+  .confirmationTextContainer {
+    width: 60vw;
+    font-size: 15px;
     text-align: center;
     line-height: 1.5;
+  }
+
+  .optOutTextContainer {
+    width: 60vw;
+    font-size: 15px;
+    text-align: center;
+    line-height: 1.5;
+    text-decoration: underline;
   }
 }
 
@@ -31,7 +38,7 @@
 @media only screen and (min-width: 600px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 100vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -40,18 +47,26 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 22vh;
     width: 75vw;
-    font-size: larger;
+    font-size: x-large;
     text-align: center;
     line-height: 1.25;
   }
 
-  .introTextContainer {
-    width: 45vw;
-    font-size: large;
+  .confirmationTextContainer {
+    width: 60vw;
+    font-size: larger;
     text-align: center;
     line-height: 1.75;
+  }
+
+  .optOutTextContainer {
+    width: 60vw;
+    font-size: larger;
+    text-align: center;
+    line-height: 1.75;
+    text-decoration: underline;
   }
 }
 
@@ -59,7 +74,7 @@
 @media only screen and (min-width: 768px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 100vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -68,18 +83,26 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 22vh;
     width: 75vw;
     font-size: x-large;
     text-align: center;
     line-height: 1.25;
   }
 
-  .introTextContainer {
-    width: 45vw;
+  .confirmationTextContainer {
+    width: 55vw;
     font-size: larger;
     text-align: center;
     line-height: 1.75;
+  }
+
+  .optOutTextContainer {
+    width: 50vw;
+    font-size: larger;
+    text-align: center;
+    line-height: 1.75;
+    text-decoration: underline;
   }
 }
 
@@ -87,7 +110,7 @@
 @media only screen and (min-width: 992px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 100vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -96,45 +119,25 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 22vh;
     width: 75vw;
     font-size: xx-large;
     text-align: center;
     line-height: 1.25;
   }
 
-  .introTextContainer {
-    width: 65vw;
+  .confirmationTextContainer {
+    width: 50vw;
     font-size: x-large;
     text-align: center;
     line-height: 1.75;
   }
-}
 
-/* Extra large devices (large laptops and desktops, 1750px and up) */
-@media only screen and (min-width: 1750px) {
-  .container {
-    background-color: #1e1e1e;
-    height: 75vh;
-    width: 100vw;
-    color: #ececec;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .titleTextContainer {
-    margin-top: 15vh;
-    width: 75vw;
-    font-size: xx-large;
-    text-align: center;
-    line-height: 1.25;
-  }
-
-  .introTextContainer {
-    width: 55vw;
+  .optOutTextContainer {
+    width: 50vw;
     font-size: x-large;
     text-align: center;
     line-height: 1.75;
+    text-decoration: underline;
   }
 }

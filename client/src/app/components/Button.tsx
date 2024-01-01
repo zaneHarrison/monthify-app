@@ -1,5 +1,6 @@
 import styles from "../styles/ButtonStyles.module.css";
 import localFont from "next/font/local";
+import Link from "next/link";
 
 const bold = localFont({
   src: "../../../fonts/Spotify-Font/Gotham-Bold.otf",
@@ -9,16 +10,17 @@ interface Props {
   className: string;
   text: string;
   link: string;
+  target: string;
 }
 
-const SignUpButton: React.FC<Props> = ({ className, text, link }) => {
+const SignUpButton: React.FC<Props> = ({ target, className, text, link }) => {
   return (
     <div id="sign-up-button">
-      <a target="_blank" href={link} className={styles.buttonWrapper}>
+      <Link target={target} href={link} className={styles.buttonWrapper}>
         <button className={styles[className]} type="button">
           <p className={bold.className}>{text}</p>
         </button>
-      </a>
+      </Link>
     </div>
   );
 };

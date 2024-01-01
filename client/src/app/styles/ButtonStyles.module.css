@@ -1,39 +1,171 @@
-.signUpButton {
-  margin-top: 100px;
-  background-color: #1ed760;
-  border: 0;
-  border-radius: 50px;
-  height: 80px;
-  width: 500px;
-  font-size: xx-large;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1e1e1e;
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  .signUpButton {
+    margin-top: 50px;
+    background-color: #1ed760;
+    border: 0;
+    border-radius: 50px;
+    height: 50px;
+    width: 285px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1e1e;
+  }
+
+  .signUpButton:hover {
+    background-color: #45e17c;
+  }
+
+  .learnMoreButton {
+    margin-bottom: 40px;
+    background-color: #1e1e1e;
+    border: 0;
+    border-radius: 50px;
+    height: 50px;
+    width: 260px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d9d9d9;
+  }
+
+  .learnMoreButton:hover {
+    background-color: #434343;
+  }
+
+  .buttonWrapper {
+    text-decoration: none;
+  }
 }
 
-.signUpButton:hover {
-  background-color: #45e17c;
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  .signUpButton {
+    margin-top: 80px;
+    background-color: #1ed760;
+    border: 0;
+    border-radius: 50px;
+    height: 60px;
+    width: 400px;
+    font-size: x-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1e1e;
+  }
+
+  .signUpButton:hover {
+    background-color: #45e17c;
+  }
+
+  .learnMoreButton {
+    margin-bottom: 50px;
+    background-color: #1e1e1e;
+    border: 0;
+    border-radius: 50px;
+    height: 55px;
+    width: 280px;
+    font-size: larger;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d9d9d9;
+  }
+
+  .learnMoreButton:hover {
+    background-color: #434343;
+  }
+
+  .buttonWrapper {
+    text-decoration: none;
+  }
 }
 
-.learnMoreButton {
-  margin-bottom: 50px;
-  background-color: #1e1e1e;
-  border: 0;
-  border-radius: 50px;
-  height: 68px;
-  width: 330px;
-  font-size: x-large;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d9d9d9;
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  .signUpButton {
+    margin-top: 80px;
+    background-color: #1ed760;
+    border: 0;
+    border-radius: 50px;
+    height: 60px;
+    width: 400px;
+    font-size: x-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1e1e;
+  }
+
+  .signUpButton:hover {
+    background-color: #45e17c;
+  }
+
+  .learnMoreButton {
+    margin-bottom: 50px;
+    background-color: #1e1e1e;
+    border: 0;
+    border-radius: 50px;
+    height: 55px;
+    width: 280px;
+    font-size: larger;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d9d9d9;
+  }
+
+  .learnMoreButton:hover {
+    background-color: #434343;
+  }
+
+  .buttonWrapper {
+    text-decoration: none;
+  }
 }
 
-.learnMoreButton:hover {
-  background-color: #434343;
-}
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  .signUpButton {
+    margin-top: 100px;
+    background-color: #1ed760;
+    border: 0;
+    border-radius: 50px;
+    height: 80px;
+    width: 500px;
+    font-size: xx-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1e1e;
+  }
 
-.buttonWrapper {
-  text-decoration: none;
+  .signUpButton:hover {
+    background-color: #45e17c;
+  }
+
+  .learnMoreButton {
+    margin-bottom: 50px;
+    background-color: #1e1e1e;
+    border: 0;
+    border-radius: 50px;
+    height: 68px;
+    width: 330px;
+    font-size: x-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d9d9d9;
+  }
+
+  .learnMoreButton:hover {
+    background-color: #434343;
+  }
+
+  .buttonWrapper {
+    text-decoration: none;
+  }
 }
