@@ -13,7 +13,7 @@
 }
 
 .signUpButton:hover {
-  background-color: #55ff90;
+  background-color: #45e17c;
 }
 
 .learnMoreButton {
@@ -32,4 +32,8 @@
 
 .learnMoreButton:hover {
   background-color: #434343;
+}
+
+.buttonWrapper {
+  text-decoration: none;
 }

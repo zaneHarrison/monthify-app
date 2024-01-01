@@ -28,4 +28,6 @@
 .createdByTextContainer {
   margin-top: 100px;
   font-size: x-large;
+  text-align: center;
+  line-height: 1.75;
 }

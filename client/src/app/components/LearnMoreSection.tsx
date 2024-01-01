@@ -31,15 +31,20 @@ export function LearnMoreSection() {
           captured in monthly playlists.
         </p>
       </div>
-      <Button className="learnMoreButton" text="View Code On GitHub" />
-      <Button className="learnMoreButton" text="Opt-Out of Monthify" />
+      <Button
+        className="learnMoreButton"
+        text="View Code On GitHub"
+        link="https://github.com/zaneHarrison/monthify-app/tree/main"
+      />
+      <Button className="learnMoreButton" text="Opt-Out of Monthify" link="" />
       <div id="created-by-text" className={styles.createdByTextContainer}>
         <p className={light.className}>
           Monthify and this website were created by{" "}
           <a href="https://www.linkedin.com/in/zane-harrison/" target="_blank">
             Zane Harrison
           </a>
-          . You can view his personal website{" "}
+          . <br />
+          You can view his personal website{" "}
           <a href="https://zlh-personal-site.vercel.app/" target="_blank">
             here
           </a>

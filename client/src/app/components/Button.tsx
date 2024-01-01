@@ -8,14 +8,17 @@ const bold = localFont({
 interface Props {
   className: string;
   text: string;
+  link: string;
 }
 
-const SignUpButton: React.FC<Props> = ({ className, text }) => {
+const SignUpButton: React.FC<Props> = ({ className, text, link }) => {
   return (
     <div id="sign-up-button">
-      <button className={styles[className]} type="button">
-        <p className={bold.className}>{text}</p>
-      </button>
+      <a target="_blank" href={link} className={styles.buttonWrapper}>
+        <button className={styles[className]} type="button">
+          <p className={bold.className}>{text}</p>
+        </button>
+      </a>
     </div>
   );
 };

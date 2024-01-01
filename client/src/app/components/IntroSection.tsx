@@ -27,7 +27,11 @@ export function IntroSection() {
           listening activity.
         </p>
       </div>
-      <Button className="signUpButton" text="Get Started With Monthify" />
+      <Button
+        className="signUpButton"
+        text="Get Started With Monthify"
+        link=""
+      />
     </div>
   );
 }
