@@ -1,24 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {};
 
+require("dotenv").config({ path: "../config.env" });
+const SERVER_BASE_URL = process.env.SERVER_BASE_URL;
+
 module.exports = () => {
   const rewrites = () => {
     return [
       {
-        source: "/api",
-        destination: "http://localhost:5001/api",
-      },
-      {
         source: "/login",
-        destination: "http://localhost:5001/login",
+        destination: `${SERVER_BASE_URL}/login`,
       },
       {
         source: "/callback",
-        destination: "http://localhost:5001/callback",
+        destination: `${SERVER_BASE_URL}/callback`,
       },
       {
         source: "/refresh_token",
-        destination: "http://localhost:5001/refresh_token",
+        destination: `${SERVER_BASE_URL}/refresh_token`,
       },
     ];
   };

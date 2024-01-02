@@ -97,7 +97,7 @@ app.get('/callback', (req: Request, res: Response) => {
 
         const { refresh_token } = response.data;
 
-        axios.get(`http://localhost:3000/refresh_token?refresh_token=${refresh_token}`)
+        axios.get(`${CLIENT_BASE_URL}/refresh_token?refresh_token=${refresh_token}`)
           .then((response: AxiosResponse) => {
             res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
           })
