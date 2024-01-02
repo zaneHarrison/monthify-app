@@ -174,7 +174,10 @@ interface User {
 }
 
 const task = new Task('test-task', async () => {
-  
+  getUsers().then((users) => {
+    console.log(generateRandomString(14));
+    console.log(users)
+  });
   // For each user
     // Use refresh token to get access token
     // Use access token to get list of their playlists

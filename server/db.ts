@@ -24,7 +24,6 @@ export async function createUser(spotify_username: string, refresh_token: string
 export async function getUsers() {
     try {
         const [rows] = await pool.query("SELECT * FROM users");
-        console.log(rows);
         return rows;
     } catch (error) {
         console.error("Error getting users from database:", error);
@@ -38,7 +37,6 @@ export async function getUserById(id: number) {
         FROM users
         WHERE id = ?
         `, [id]);
-        console.log(rows[0]);
         return rows[0];
     } catch (error) {
         console.error("Error getting user from database:", error);
