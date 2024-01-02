@@ -15,10 +15,6 @@ module.exports = () => {
         source: "/callback",
         destination: `${SERVER_BASE_URL}/callback`,
       },
-      {
-        source: "/refresh_token",
-        destination: `${SERVER_BASE_URL}/refresh_token`,
-      },
     ];
   };
   return {

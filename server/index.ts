@@ -15,6 +15,7 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL;
+const SERVER_BASE_URL = process.env.SERVER_BASE_URL;
 
 // Create app, assign backend port
 const app: Express = express();
@@ -95,15 +96,31 @@ app.get('/callback', (req: Request, res: Response) => {
     .then((response: AxiosResponse) => {
       if (response.status === 200) {
 
-        const { refresh_token } = response.data;
+        const { refresh_token, access_token, token_type } = response.data;
 
-        axios.get(`${CLIENT_BASE_URL}/refresh_token?refresh_token=${refresh_token}`)
-          .then((response: AxiosResponse) => {
-            res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+        axios.get('https://api.spotify.com/v1/me', {
+          headers: {
+            Authorization: `${token_type} ${access_token}`
+          }
+        })
+          .then(response => {
+            const spotify_username = response.data.display_name;
+            createUser(spotify_username, refresh_token);
+            res.redirect(`${CLIENT_BASE_URL}/signed-up`);
           })
-          .catch((error: AxiosError) => {
+          .catch(error => {
             res.send(error);
           });
+
+        // const { refresh_token } = response.data;
+
+        // axios.get(`${SERVER_BASE_URL}/refresh_token?refresh_token=${refresh_token}`)
+        //   .then((response: AxiosResponse) => {
+        //     res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+        //   })
+        //   .catch((error: AxiosError) => {
+        //     res.send(error);
+        //   });
 
       } else {
         res.send(response);
