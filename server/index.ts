@@ -108,8 +108,9 @@ app.get('/callback', (req: Request, res: Response) => {
           }
         })
           .then(response => {
-            const spotify_username = response.data.display_name;
-            createUser(spotify_username, refresh_token);
+            const spotify_display_name = response.data.display_name;
+            const spotify_id = response.data.id;
+            createUser(spotify_display_name, spotify_id, refresh_token);
             res.redirect(`${CLIENT_BASE_URL}/signed-up`);
           })
           .catch(error => {
@@ -167,16 +168,14 @@ app.get('/refresh_token', (req: Request, res: Response) => {
 //                                                                 //
 ////***************************************************************//
 
-interface User {
-  id: number;
-  spotify_username: string;
-  refresh_token: string;
-}
-
 const task = new Task('test-task', async () => {
-  getUsers().then((users) => {
-    console.log(generateRandomString(14));
-    console.log(users)
+  const users = await getUsers();
+  users?.forEach(user => {
+    const spotify_display_name = user.spotify_display_name;
+    const spotify_id = user.spotify_id;
+    const refresh_token = user.refresh_token;
+    
+    
   });
   // For each user
     // Use refresh token to get access token
@@ -184,7 +183,6 @@ const task = new Task('test-task', async () => {
     // For each playlist
       // 
 
-  console.log("Task ran!")
 });
 const job = new SimpleIntervalJob({seconds: 5, }, task);
 scheduler.addSimpleIntervalJob(job);

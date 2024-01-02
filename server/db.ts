@@ -9,13 +9,13 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE,
 }).promise();
 
-export async function createUser(spotify_username: string, refresh_token: string) {
+export async function createUser(spotify_display_name: string, spotify_id: string, refresh_token: string) {
     try {
         await pool.query(`
-        INSERT INTO users (spotify_username, refresh_token)
-        VALUES (?, ?)
-        `, [spotify_username, refresh_token]);
-        console.log(`User with username ${spotify_username} successfully added to database.`)
+        INSERT INTO users (spotify_display_name, spotify_id, refresh_token)
+        VALUES (?, ?, ?)
+        `, [spotify_display_name, spotify_id, refresh_token]);
+        console.log(`User ${spotify_display_name} successfully added to database.`)
     } catch (error) {
         console.error("Error inserting user into database:", error);
     }
@@ -24,7 +24,7 @@ export async function createUser(spotify_username: string, refresh_token: string
 export async function getUsers() {
     try {
         const [rows] = await pool.query("SELECT * FROM users");
-        return rows;
+        return rows as RowDataPacket[];
     } catch (error) {
         console.error("Error getting users from database:", error);
     } 
