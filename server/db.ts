@@ -18,8 +18,6 @@ export async function createUser(spotify_username: string, refresh_token: string
         console.log(`User with username ${spotify_username} successfully added to database.`)
     } catch (error) {
         console.error("Error inserting user into database:", error);
-    } finally {
-        pool.end();
     }
 }
 
@@ -30,9 +28,7 @@ export async function getUsers() {
         return rows;
     } catch (error) {
         console.error("Error getting users from database:", error);
-    } finally {
-        pool.end();
-    }
+    } 
 }
 
 export async function getUserById(id: number) {
@@ -46,8 +42,6 @@ export async function getUserById(id: number) {
         return rows[0];
     } catch (error) {
         console.error("Error getting user from database:", error);
-    } finally {
-        pool.end();
     }
 }
 
@@ -60,7 +54,6 @@ export async function deleteUser(id: number) {
         console.log(`User with id ${id} deleted successfully.`)
     } catch (error) {
         console.error(`Error deleting user with id ${id} from database:`, error);
-    } finally {
-        pool.end();
-    }
+    } 
 }
+

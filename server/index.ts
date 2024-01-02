@@ -6,6 +6,7 @@ import axios from "axios";
 import { AxiosError, AxiosResponse } from "axios";
 import cookieParser from 'cookie-parser';
 import { createUser, getUsers, getUserById, deleteUser } from "./db.js";
+import { ToadScheduler, SimpleIntervalJob, Task } from "toad-scheduler";
 
 // Enable the use of environment variables
 dotenv.config({ path: "../config.env" });
@@ -24,6 +25,9 @@ const port = parseInt(process.env.SERVER_PORT || "", 10);
 // Use variable to track state
 const stateKey = 'spotify_auth_state';
 
+// Scheduler for hourly task
+const scheduler = new ToadScheduler();
+
 // Add cookieParser middleware to application
 app.use(cookieParser());
 
@@ -39,7 +43,7 @@ app.get("/login", (req: Request, res: Response) => {
   res.cookie(stateKey, state);
 
   // Define authorized access levels for application
-  const scope = 'user-read-private user-read-email';
+  const scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-private user-read-email';
 
   // Build query string
   const queryParams: string = querystring.stringify({
@@ -157,3 +161,27 @@ app.get('/refresh_token', (req: Request, res: Response) => {
     });
 });
 
+//*****************************************************************//
+//                                                                 //
+//                           TASK  LOGIC                           //
+//                                                                 //
+////***************************************************************//
+
+interface User {
+  id: number;
+  spotify_username: string;
+  refresh_token: string;
+}
+
+const task = new Task('test-task', async () => {
+  
+  // For each user
+    // Use refresh token to get access token
+    // Use access token to get list of their playlists
+    // For each playlist
+      // 
+
+  console.log("Task ran!")
+});
+const job = new SimpleIntervalJob({seconds: 5, }, task);
+scheduler.addSimpleIntervalJob(job);
