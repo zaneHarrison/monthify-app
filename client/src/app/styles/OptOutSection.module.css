@@ -121,14 +121,14 @@
   .titleTextContainer {
     margin-top: 22vh;
     width: 75vw;
-    font-size: 2.3vh;
+    font-size: 2.5vh;
     text-align: center;
     line-height: 1.25;
   }
 
   .confirmationTextContainer {
     width: 60vw;
-    font-size: 2vh;
+    font-size: 2.3vh;
     text-align: center;
     line-height: 1.75;
   }
