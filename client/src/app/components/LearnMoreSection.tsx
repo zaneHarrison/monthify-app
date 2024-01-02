@@ -14,7 +14,7 @@ export function LearnMoreSection() {
   return (
     <div id="learn-more-section" className={styles.container}>
       <div id="title-text" className={styles.titleTextContainer}>
-        <h1 className={bold.className}>How Monthify Works</h1>
+        <h1 className={bold.className}>How It Works</h1>
       </div>
       <div id="learn-more-text" className={styles.learnMoreTextContainer}>
         <p className={light.className}>

@@ -40,7 +40,7 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 10vh;
     width: 75vw;
     font-size: larger;
     text-align: center;
@@ -49,7 +49,7 @@
 
   .introTextContainer {
     width: 45vw;
-    font-size: large;
+    font-size: 1.75vh;
     text-align: center;
     line-height: 1.75;
   }
@@ -59,7 +59,7 @@
 @media only screen and (min-width: 768px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 85vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -68,16 +68,16 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 12vh;
     width: 75vw;
-    font-size: x-large;
+    font-size: 2.7vh;
     text-align: center;
     line-height: 1.25;
   }
 
   .introTextContainer {
     width: 45vw;
-    font-size: larger;
+    font-size: 2vh;
     text-align: center;
     line-height: 1.75;
   }
@@ -87,7 +87,7 @@
 @media only screen and (min-width: 992px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 85vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -96,16 +96,16 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 10vh;
     width: 75vw;
-    font-size: xx-large;
+    font-size: 2.8vh;
     text-align: center;
     line-height: 1.25;
   }
 
   .introTextContainer {
-    width: 65vw;
-    font-size: x-large;
+    width: 50vw;
+    font-size: 2vh;
     text-align: center;
     line-height: 1.75;
   }
@@ -115,7 +115,7 @@
 @media only screen and (min-width: 1750px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 85vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -124,16 +124,16 @@
   }
 
   .titleTextContainer {
-    margin-top: 15vh;
+    margin-top: 9vh;
     width: 75vw;
-    font-size: xx-large;
+    font-size: 2.7vh;
     text-align: center;
     line-height: 1.25;
   }
 
   .introTextContainer {
-    width: 55vw;
-    font-size: x-large;
+    width: 40vw;
+    font-size: 1.8vh;
     text-align: center;
     line-height: 1.75;
   }

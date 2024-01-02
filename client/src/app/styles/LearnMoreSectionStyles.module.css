@@ -126,23 +126,60 @@
   .titleTextContainer {
     margin-top: 8vh;
     width: 60vw;
-    font-size: x-large;
+    font-size: 2.5vh;
     text-align: center;
     line-height: 1.25;
   }
 
   .learnMoreTextContainer {
-    margin-top: 20px;
-    margin-bottom: 100px;
+    margin-top: 1vh;
+    margin-bottom: 6vh;
     width: 45vw;
-    font-size: x-large;
+    font-size: 2.2vh;
     text-align: center;
     line-height: 1.75;
   }
 
   .createdByTextContainer {
-    margin-top: 100px;
-    font-size: x-large;
+    margin-top: 5vh;
+    font-size: 2.2vh;
+    text-align: center;
+    line-height: 1.75;
+  }
+}
+
+/* Extra large devices (large laptops and desktops, 1750px and up) */
+@media only screen and (min-width: 1750px) {
+  .container {
+    height: 100vh;
+    width: 100vw;
+    background-color: #d9d9d9;
+    color: #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .titleTextContainer {
+    margin-top: 8vh;
+    width: 60vw;
+    font-size: 2.4vh;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .learnMoreTextContainer {
+    margin-top: 1vh;
+    margin-bottom: 6vh;
+    width: 45vw;
+    font-size: 1.8vh;
+    text-align: center;
+    line-height: 1.75;
+  }
+
+  .createdByTextContainer {
+    margin-top: 5vh;
+    font-size: 1.8vh;
     text-align: center;
     line-height: 1.75;
   }
