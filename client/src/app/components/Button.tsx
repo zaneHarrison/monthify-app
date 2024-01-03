@@ -13,7 +13,7 @@ interface Props {
   target: string;
 }
 
-const SignUpButton: React.FC<Props> = ({ target, className, text, link }) => {
+const Button: React.FC<Props> = ({ target, className, text, link }) => {
   return (
     <div id="sign-up-button">
       <Link target={target} href={link} className={styles.buttonWrapper}>
@@ -25,4 +25,4 @@ const SignUpButton: React.FC<Props> = ({ target, className, text, link }) => {
   );
 };
 
-export default SignUpButton;
+export default Button;

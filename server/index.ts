@@ -111,7 +111,7 @@ app.get('/callback', (req: Request, res: Response) => {
             const spotify_display_name = response.data.display_name;
             const spotify_id = response.data.id;
             createUser(spotify_display_name, spotify_id, refresh_token);
-            res.redirect(`${CLIENT_BASE_URL}/signed-up`);
+            res.redirect(`${CLIENT_BASE_URL}/signed_up`);
           })
           .catch(error => {
             res.send(error);
@@ -160,6 +160,11 @@ app.get('/refresh_token', (req: Request, res: Response) => {
     .catch((error: AxiosError) => {
       res.send(error);
     });
+});
+
+app.get('/opt_out', (req: Request, res: Response) => {
+  console.log("Reached server, redirecting back to client route");
+  res.redirect(`${CLIENT_BASE_URL}/opt-out`);
 });
 
 //*****************************************************************//

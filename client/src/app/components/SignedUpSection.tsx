@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import styles from "../styles/SignedUpSection.module.css";
 import Button from "./Button";
+import Link from "next/link";
 
 const light = localFont({
   src: "../../../fonts/Spotify-Font/Gotham-Light.otf",
@@ -27,7 +28,9 @@ export default function SignedUpConfirmation() {
         </p>
       </div>
       <div id="opt-out-text" className={styles.optOutTextContainer}>
-        <p className={bold.className}>You can opt-out of Monthify here.</p>
+        <p className={light.className}>
+          You can opt-out of Monthify <Link href="/opt_out">here</Link>.
+        </p>
       </div>
       <Button
         target="_self"
