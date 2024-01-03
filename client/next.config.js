@@ -16,8 +16,8 @@ module.exports = () => {
         destination: `${SERVER_BASE_URL}/callback`,
       },
       {
-        source: "/opt_out",
-        destination: `${SERVER_BASE_URL}/opt_out`,
+        source: "/opt-out",
+        destination: `${SERVER_BASE_URL}/opt-out`,
       },
     ];
   };
