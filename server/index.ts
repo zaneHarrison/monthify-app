@@ -50,7 +50,7 @@ app.get("/login", (req: Request, res: Response) => {
     client_id: CLIENT_ID,
     response_type: 'code',
     redirect_uri: REDIRECT_URI,
-    state: state,
+    state: req.query.optOut ? 'optOut' : state,
     scope: scope,
     show_dialog: true
   });
@@ -65,7 +65,7 @@ app.get("/login", (req: Request, res: Response) => {
 app.get('/callback', (req: Request, res: Response) => {
   // Check state equality
   const state = req.query.state as string || null;
-  if (state !== req.cookies[stateKey]) {
+  if (state !== 'optOut' && state !== req.cookies[stateKey]) {
     console.log("States do not match. Ending authorization flow and redirecting user to error page.");
     res.redirect(`${CLIENT_BASE_URL}/error`);
     return;
@@ -110,7 +110,19 @@ app.get('/callback', (req: Request, res: Response) => {
           .then(response => {
             const spotify_display_name = response.data.display_name;
             const spotify_id = response.data.id;
+
+            // Delete user from database if they are opting out
+            if (state === 'optOut') {
+              console.log("Opt-Out: Deleting user from database.");
+              deleteUser(spotify_id);
+              res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`);
+              return;
+            }
+
+            // Otherwise they're signing up so add user to database
             createUser(spotify_display_name, spotify_id, refresh_token);
+
+            // Redirect user to signed up confirmation page
             res.redirect(`${CLIENT_BASE_URL}/sign-up`);
           })
           .catch(error => {
@@ -164,6 +176,7 @@ app.get('/refresh_token', (req: Request, res: Response) => {
 
 app.get('/opt-out', (req: Request, res: Response) => {
   console.log("Reached server, redirecting back to client route");
+
   res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`);
 });
 

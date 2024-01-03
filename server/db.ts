@@ -43,15 +43,15 @@ export async function getUserById(id: number) {
     }
 }
 
-export async function deleteUser(id: number) {
+export async function deleteUser(sptoify_id: string) {
     try {
         await pool.query(`
         DELETE FROM users
-        WHERE id = ?
-        `, [id]);
-        console.log(`User with id ${id} deleted successfully.`)
+        WHERE spotify_id = ?
+        `, [sptoify_id]);
+        console.log(`User with username ${sptoify_id} deleted successfully.`)
     } catch (error) {
-        console.error(`Error deleting user with id ${id} from database:`, error);
+        console.error(`Error deleting user with username ${sptoify_id} from database:`, error);
     } 
 }
 

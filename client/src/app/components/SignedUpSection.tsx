@@ -29,7 +29,8 @@ export default function SignedUpConfirmation() {
       </div>
       <div id="opt-out-text" className={styles.optOutTextContainer}>
         <p className={light.className}>
-          You can opt-out of Monthify <Link href="/opt_out">here</Link>.
+          You can opt-out of Monthify{" "}
+          <Link href="/login?optOut=true">here</Link>.
         </p>
       </div>
       <Button
