@@ -17,7 +17,6 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL;
-const SERVER_BASE_URL = process.env.SERVER_BASE_URL;
 
 // Create app, assign backend port
 const app: Express = express();
@@ -110,18 +109,41 @@ app.get('/callback', (req: Request, res: Response) => {
         })
           .then(response => {
             const spotify_display_name = response.data.display_name;
-            const spotify_id = response.data.id;
+            const spotify_user_id = response.data.id;
 
             // Delete user from database if they are opting out
             if (state === 'optOut') {
               console.log("Opt-Out: Deleting user from database.");
-              deleteUser(spotify_id);
+              deleteUser(spotify_user_id);
               res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`);
               return;
             }
 
             // Otherwise they're signing up so add user to database
-            createUser(spotify_display_name, spotify_id, refresh_token);
+
+            // 1) Create playlists for user signing up
+            console.log(`Creating Monthify 30 playlist for user ${spotify_user_id}`);
+            axios.post(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists`, 
+            {
+              "name": "Monthify 30",
+              "description": "An automatically curated playlist of your tracks from the past 30 days.",
+              "public": false
+            },
+            {
+              headers: {
+                "Authorization": `Bearer ${access_token}`,
+                "Content-Type": "application/json"
+              }
+            })
+              .then((response: AxiosResponse) => {
+                console.log(`Successfully created 'Monthify 30' playlist for user ${spotify_user_id}`)
+              })
+              .catch((error: AxiosError) => {
+                console.log(`Error: ${error}`)
+              });
+
+            // 2) Add user to database
+            createUser(spotify_display_name, spotify_user_id, refresh_token);
 
             // Redirect user to signed up confirmation page
             res.redirect(`${CLIENT_BASE_URL}/sign-up`);
@@ -175,7 +197,6 @@ const task = new Task('test-task', async () => {
   // Get all users from database
   const users = await getUsers();
   users?.forEach(user => {
-    const spotify_display_name = user.spotify_display_name;
     const spotify_id = user.spotify_id;
     const refresh_token = user.refresh_token;
 

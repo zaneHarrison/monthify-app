@@ -9,7 +9,7 @@ export async function getPlaylists(spotify_id: string, access_token: string) {
         },
     })
         .then((response: AxiosResponse) => {
-            console.log(response.data);
+            console.log("Playlists retrieved.");
         })
     return;
 }

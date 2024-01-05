@@ -9,12 +9,14 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE,
 }).promise();
 
-export async function createUser(spotify_display_name: string, spotify_id: string, refresh_token: string) {
+// USERS TABLE
+
+export async function createUser(spotify_display_name: string, spotify_user_id: string, refresh_token: string) {
     try {
         await pool.query(`
-        INSERT INTO users (spotify_display_name, spotify_id, refresh_token)
+        INSERT INTO users (spotify_display_name, spotify_user_id, refresh_token)
         VALUES (?, ?, ?)
-        `, [spotify_display_name, spotify_id, refresh_token]);
+        `, [spotify_display_name, spotify_user_id, refresh_token]);
         console.log(`User ${spotify_display_name} successfully added to database.`)
     } catch (error) {
         console.error("Error inserting user into database:", error);
@@ -43,15 +45,27 @@ export async function getUserById(id: number) {
     }
 }
 
-export async function deleteUser(sptoify_id: string) {
+export async function deleteUser(spotify_user_id: string) {
     try {
         await pool.query(`
         DELETE FROM users
-        WHERE spotify_id = ?
-        `, [sptoify_id]);
-        console.log(`User with username ${sptoify_id} deleted successfully.`)
+        WHERE spotify_user_id = ?
+        `, [spotify_user_id]);
+        console.log(`User with username ${spotify_user_id} deleted successfully.`)
     } catch (error) {
-        console.error(`Error deleting user with username ${sptoify_id} from database:`, error);
+        console.error(`Error deleting user with username ${spotify_user_id} from database:`, error);
     } 
 }
 
+// MONTH TABLE
+
+export async function updateMonth(current_month: number) {
+    try {
+        await pool.query(`
+        UPDATE month SET current_month = ?
+        `, [current_month]);
+        console.log(`Current month value updated to ${current_month} in database.`)
+    } catch (error) {
+        console.error("Error updating current month value in database:", error);
+    }
+}
