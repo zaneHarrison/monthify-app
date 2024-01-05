@@ -7,7 +7,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import cookieParser from 'cookie-parser';
 import { createUser, getUsers, getUserById, deleteUser } from "./db.js";
 import { ToadScheduler, SimpleIntervalJob, Task } from "toad-scheduler";
-import { getPlaylists } from "./utils/playlistLogic.js";
+import { createMonthify30Playlist, createMonthlyPlaylist, getPlaylists } from "./utils/playlistLogic.js";
 
 // Enable the use of environment variables
 dotenv.config({ path: "../config.env" });
@@ -102,6 +102,8 @@ app.get('/callback', (req: Request, res: Response) => {
 
         const { refresh_token, access_token, token_type } = response.data;
 
+        // Fetch current user information
+        console.log("Fetching user spotify profile data")
         axios.get('https://api.spotify.com/v1/me', {
           headers: {
             Authorization: `${token_type} ${access_token}`
@@ -113,7 +115,7 @@ app.get('/callback', (req: Request, res: Response) => {
 
             // Delete user from database if they are opting out
             if (state === 'optOut') {
-              console.log("Opt-Out: Deleting user from database.");
+              console.log(`User has chose to opt-out, deleting user ${spotify_user_id} from database.`);
               deleteUser(spotify_user_id);
               res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`);
               return;
@@ -121,29 +123,26 @@ app.get('/callback', (req: Request, res: Response) => {
 
             // Otherwise they're signing up so add user to database
 
-            // 1) Create playlists for user signing up
-            console.log(`Creating Monthify 30 playlist for user ${spotify_user_id}`);
-            axios.post(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists`, 
-            {
-              "name": "Monthify 30",
-              "description": "An automatically curated playlist of your tracks from the past 30 days.",
-              "public": false
-            },
-            {
-              headers: {
-                "Authorization": `Bearer ${access_token}`,
-                "Content-Type": "application/json"
-              }
-            })
-              .then((response: AxiosResponse) => {
-                console.log(`Successfully created 'Monthify 30' playlist for user ${spotify_user_id}`)
-              })
-              .catch((error: AxiosError) => {
-                console.log(`Error: ${error}`)
-              });
+            // Check if they're already in the database
+            getUserById(spotify_user_id).then(response => {
+              if (response) {
+                console.log("User already signed up, terminating sign up");
+              } else { // User isn't already in the database, so add them
+                console.log("User does not already exist in database, continuing with sign up");
+                // Create playlists for user signing up
+                // a) Create Monthify 30 playlist
+                console.log(`Creating Monthify 30 playlist for user ${spotify_user_id}`);
+                createMonthify30Playlist(spotify_user_id, access_token);
 
-            // 2) Add user to database
-            createUser(spotify_display_name, spotify_user_id, refresh_token);
+                // b) Create current month playlist
+                console.log(`Creating current month's playlist for user ${spotify_user_id}`);
+                const current_date = new Date();
+                createMonthlyPlaylist(spotify_user_id, access_token, current_date);
+
+                // 2) Add user to database
+                createUser(spotify_display_name, spotify_user_id, refresh_token);
+              }
+            });
 
             // Redirect user to signed up confirmation page
             res.redirect(`${CLIENT_BASE_URL}/sign-up`);
@@ -225,4 +224,4 @@ const task = new Task('test-task', async () => {
 });
 
 const job = new SimpleIntervalJob({seconds: 5, }, task);
-scheduler.addSimpleIntervalJob(job);
+//scheduler.addSimpleIntervalJob(job);

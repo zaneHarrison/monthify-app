@@ -32,13 +32,13 @@ export async function getUsers() {
     } 
 }
 
-export async function getUserById(id: number) {
+export async function getUserById(spotify_user_id: string) {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(`
         SELECT *
         FROM users
-        WHERE id = ?
-        `, [id]);
+        WHERE spotify_user_id = ?
+        `, [spotify_user_id]);
         return rows[0];
     } catch (error) {
         console.error("Error getting user from database:", error);
