@@ -11,6 +11,7 @@ const pool = mysql.createPool({
 
 // USERS TABLE
 
+// Add a new user
 export async function createUser(spotify_display_name: string, spotify_user_id: string, refresh_token: string) {
     try {
         await pool.query(`
@@ -23,6 +24,7 @@ export async function createUser(spotify_display_name: string, spotify_user_id: 
     }
 }
 
+// Retrieve a list of all users
 export async function getUsers() {
     try {
         const [rows] = await pool.query("SELECT * FROM users");
@@ -32,6 +34,7 @@ export async function getUsers() {
     } 
 }
 
+// Retrieve a particular user from their id
 export async function getUserById(spotify_user_id: string) {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(`
@@ -45,6 +48,7 @@ export async function getUserById(spotify_user_id: string) {
     }
 }
 
+// Delete a particular user from their id
 export async function deleteUser(spotify_user_id: string) {
     try {
         await pool.query(`
@@ -57,8 +61,37 @@ export async function deleteUser(spotify_user_id: string) {
     } 
 }
 
+// Update a particular user's monthly_playlist_id value
+export async function updateUsersMonthlyPlaylistId(spotify_user_id: string, monthly_playlist_id: string) {
+    try {
+        await pool.query(`
+        UPDATE users
+        SET monthly_playlist_id = ?
+        WHERE spotify_user_id = ?;
+        `, [monthly_playlist_id, spotify_user_id]);
+        console.log(`Successfully updated monthly_playlist_id value for user with username ${spotify_user_id}.`)
+    } catch (error) {
+        console.error(`Error updating monthly_playlist_id value for user with username ${spotify_user_id}:`, error);
+    } 
+}
+
+// Update a particular user's monthly_playlist_id value
+export async function updateMonthify30Id(spotify_user_id: string, monthify_30_id: string) {
+    try {
+        await pool.query(`
+        UPDATE users
+        SET monthify_30_id = ?
+        WHERE spotify_user_id = ?;
+        `, [monthify_30_id, spotify_user_id]);
+        console.log(`Successfully updated monthify_30_id value for user with username ${spotify_user_id}.`)
+    } catch (error) {
+        console.error(`Error updating monthify_30_id value for user with username ${spotify_user_id}:`, error);
+    } 
+}
+
 // MONTH TABLE
 
+// Update the current month
 export async function updateMonth(current_month: number) {
     try {
         await pool.query(`

@@ -5,7 +5,7 @@ import querystring from "querystring";
 import axios from "axios";
 import { AxiosError, AxiosResponse } from "axios";
 import cookieParser from 'cookie-parser';
-import { createUser, getUsers, getUserById, deleteUser } from "./db.js";
+import { createUser, getUsers, getUserById, deleteUser, updateUsersMonthlyPlaylistId } from "./db.js";
 import { ToadScheduler, SimpleIntervalJob, Task } from "toad-scheduler";
 import { createMonthify30Playlist, createMonthlyPlaylist, getPlaylists } from "./utils/playlistLogic.js";
 
@@ -115,7 +115,7 @@ app.get('/callback', (req: Request, res: Response) => {
 
             // Delete user from database if they are opting out
             if (state === 'optOut') {
-              console.log(`User has chose to opt-out, deleting user ${spotify_user_id} from database.`);
+              console.log(`User has chosen to opt-out, deleting user ${spotify_user_id} from database.`);
               deleteUser(spotify_user_id);
               res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`);
               return;
@@ -130,14 +130,14 @@ app.get('/callback', (req: Request, res: Response) => {
               } else { // User isn't already in the database, so add them
                 console.log("User does not already exist in database, continuing with sign up");
                 // Create playlists for user signing up
-                // a) Create Monthify 30 playlist
-                console.log(`Creating Monthify 30 playlist for user ${spotify_user_id}`);
-                createMonthify30Playlist(spotify_user_id, access_token);
-
-                // b) Create current month playlist
+                // a) Create current month playlist
                 console.log(`Creating current month's playlist for user ${spotify_user_id}`);
                 const current_date = new Date();
                 createMonthlyPlaylist(spotify_user_id, access_token, current_date);
+
+                // b) Create Monthify 30 playlist
+                console.log(`Creating Monthify 30 playlist for user ${spotify_user_id}`);
+                createMonthify30Playlist(spotify_user_id, access_token);                
 
                 // 2) Add user to database
                 createUser(spotify_display_name, spotify_user_id, refresh_token);
