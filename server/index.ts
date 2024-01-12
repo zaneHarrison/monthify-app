@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { createUser, getUsers, getUserById, deleteUser, updateUsersMonthlyPlaylistId } from "./db.js";
 import { ToadScheduler, SimpleIntervalJob, Task } from "toad-scheduler";
 import { createMonthify30Playlist, createMonthlyPlaylist, getPlaylists } from "./utils/playlistLogic.js";
+import { RowDataPacket } from "mysql2";
 
 // Enable the use of environment variables
 dotenv.config({ path: "../config.env" });
@@ -194,34 +195,33 @@ app.get('/refresh_token', (req: Request, res: Response) => {
 // Define scheduled task to run 
 const task = new Task('test-task', async () => {
   // Get all users from database
-  const users = await getUsers();
-  users?.forEach(user => {
-    const spotify_id = user.spotify_id;
-    const refresh_token = user.refresh_token;
-
-    // Use user's refresh token to get access token
-    axios({
-      method: 'post',
-      url: 'https://accounts.spotify.com/api/token',
-      data: querystring.stringify({
-        grant_type: 'refresh_token',
-        refresh_token: refresh_token
-      }),
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-      },
+  getUsers().then((response: RowDataPacket[]) => {
+    response.forEach(user => {
+      const spotify_id = user.spotify_user_id;
+      const refresh_token = user.refresh_token;
+      // Use user's refresh token to get access token
+      axios({
+        method: 'post',
+        url: 'https://accounts.spotify.com/api/token',
+        data: querystring.stringify({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token
+          }),
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+        },
+      })
+        .then((response: AxiosResponse) => {
+          const access_token = response.data.access_token;
+          getPlaylists(spotify_id, access_token);  
+        }) 
+        .catch((error: AxiosError) => {
+          console.log(error);
+        });
     })
-      .then((response: AxiosResponse) => {
-        const access_token = response.data.access_token;
-        getPlaylists(spotify_id, access_token);
-        
-      }) 
-      .catch((error: AxiosError) => {
-        console.log(error);
-      });    
   });
 });
 
 const job = new SimpleIntervalJob({seconds: 5, }, task);
-//scheduler.addSimpleIntervalJob(job);
+scheduler.addSimpleIntervalJob(job);

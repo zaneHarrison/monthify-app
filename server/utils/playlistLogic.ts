@@ -4,14 +4,17 @@ import { updateUsersMonthlyPlaylistId, updateMonthify30Id } from "../db.js";
 
 // API call to return list of playlists for a particular user
 export async function getPlaylists(spotify_user_id: string, access_token: string) {
-    axios.get(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists?limit=1`, {
+    console.log("Entered getPlaylists()");
+    let next: string | null = `https://api.spotify.com/v1/users/${spotify_user_id}/playlists?limit=5`;
+    while (next) {
+      const response: AxiosResponse = await axios.get(`${next}`, {
         headers: {
             Authorization: `Bearer ${access_token}`,
         },
-    })
-        .then((response: AxiosResponse) => {
-            console.log("Playlists retrieved.");
-        })
+      });
+      next = response.data.next;
+      console.log(response.data);
+    }; 
     return;
 }
 

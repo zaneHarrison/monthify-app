@@ -31,6 +31,7 @@ export async function getUsers() {
         return rows as RowDataPacket[];
     } catch (error) {
         console.error("Error getting users from database:", error);
+        return [];
     } 
 }
 
