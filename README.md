@@ -1,8 +1,8 @@
 # Monthify
 
-Monthify is a web application that uses Spotify's API to automatically create Spotify playlists each month based on a user's Spotify playlist activity for that month. 
+Monthify is a web application that uses Spotify's API to automatically create Spotify playlists each month based on a user's Spotify playlist activity for that month.
 
-The backend consists of a Node.js server running Express as well as a MYSQL database to store user information. The frontend is built with Next.js.
+The backend consists of a Node.js server running Express as well as a MySQL database to store user information. The frontend is built with Next.js.
 
 Monthify is a personal project created by Zane Harrison.
 
