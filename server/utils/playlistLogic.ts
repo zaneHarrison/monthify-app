@@ -2,22 +2,6 @@ import axios from "axios";
 import { AxiosError, AxiosResponse } from "axios";
 import { updateUsersMonthlyPlaylistId, updateMonthify30Id } from "../db.js";
 
-// API call to return list of playlists for a particular user
-export async function getPlaylists(spotify_user_id: string, access_token: string) {
-    console.log("Entered getPlaylists()");
-    let next: string | null = `https://api.spotify.com/v1/users/${spotify_user_id}/playlists?limit=5`;
-    while (next) {
-      const response: AxiosResponse = await axios.get(`${next}`, {
-        headers: {
-            Authorization: `Bearer ${access_token}`,
-        },
-      });
-      next = response.data.next;
-      console.log(response.data);
-    }; 
-    return;
-}
-
 // API call to create the monthly playlist for a particular user
 export async function createMonthlyPlaylist(spotify_user_id: string, access_token: string, current_date: Date) {
   // Construct playlist name
@@ -78,4 +62,59 @@ export async function createMonthify30Playlist(spotify_user_id: string, access_t
             console.log(`Error: ${error}`)
           });
     return;
+}
+
+// Function to generate a list of playlists for a particular user
+export async function getPlaylists(spotify_user_id: string, access_token: string) {
+  // Array to hold playlist ids
+  let playlistIds: string[] = [];
+  
+  // API endpoint for each request, updated with each response
+  let next: string | null = `https://api.spotify.com/v1/users/${spotify_user_id}/playlists?limit=50`;
+  
+  // Request 50 playlists at a time 
+  while (next) {
+    const response: AxiosResponse = await axios.get(`${next}`, {
+      headers: {
+          Authorization: `Bearer ${access_token}`,
+      },
+    });
+    // Logic to playlists to array
+    const playlists = response.data.items;
+    
+    // Get name of monthly playlist 
+    const current_date = new Date();
+    const current_month = current_date.toLocaleString('default', { month: 'long' });
+    const current_year = current_date.getFullYear();
+    const playlist_name = `${current_month} ${current_year}`;
+
+    playlists.forEach((playlist: any) => {
+      // Only add non-collaborative playlists owned by the user, and skip monthly playlist
+      if (playlist.collaborative === false && 
+        playlist.name !== playlist_name && 
+        playlist.owner.id === spotify_user_id) {
+        playlistIds.push(playlist.id);
+      }
+    })
+
+    // Reasign variable to fetch next set of 50 playlists
+    next = response.data.next;
+  }; 
+  console.log(playlistIds);
+  return playlistIds;
+}
+
+// Function to get tracks from a playlist
+export async function getTracksFromPlaylist(access_token: string, playlist_id: string) {
+  let tracks: string[] = [];
+  const response: AxiosResponse = await axios.get(``, {
+    headers: {
+        Authorization: `Bearer ${access_token}`,
+    },
+  });
+}
+
+// Function to update user's monthly playlist
+export async function updatePlaylists() {
+
 }
