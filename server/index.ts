@@ -7,7 +7,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import cookieParser from 'cookie-parser';
 import { createUser, getUsers, getUserById, deleteUser, updateUsersMonthlyPlaylistId } from "./db.js";
 import { ToadScheduler, SimpleIntervalJob, Task } from "toad-scheduler";
-import { createMonthify30Playlist, createMonthlyPlaylist, getPlaylists } from "./utils/playlistLogic.js";
+import { createMonthify30Playlist, createMonthlyPlaylist, getPlaylists, getTracksFromPlaylist } from "./utils/playlistLogic.js";
 import { RowDataPacket } from "mysql2";
 
 // Enable the use of environment variables
@@ -194,6 +194,7 @@ app.get('/refresh_token', (req: Request, res: Response) => {
 
 // Define scheduled task to run 
 const task = new Task('test-task', async () => {
+  console.log("TASK STARTING");
   // Get all users from database
   getUsers().then((response: RowDataPacket[]) => {
     response.forEach(user => {
@@ -214,7 +215,8 @@ const task = new Task('test-task', async () => {
       })
         .then((response: AxiosResponse) => {
           const access_token = response.data.access_token;
-          getPlaylists(spotify_id, access_token);  
+          //getPlaylists(spotify_id, access_token);  
+          getTracksFromPlaylist(access_token, '0bYGcx0QW3w2RKYxdCF1AL');
         }) 
         .catch((error: AxiosError) => {
           console.log(error);

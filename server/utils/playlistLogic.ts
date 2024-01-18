@@ -66,6 +66,12 @@ export async function createMonthify30Playlist(spotify_user_id: string, access_t
 
 // Function to generate a list of playlists for a particular user
 export async function getPlaylists(spotify_user_id: string, access_token: string) {
+  // Get name of monthly playlist 
+  const current_date = new Date();
+  const current_month = current_date.toLocaleString('default', { month: 'long' });
+  const current_year = current_date.getFullYear();
+  const montly_playlist_name = `${current_month} ${current_year}`;
+  
   // Array to hold playlist ids
   let playlistIds: string[] = [];
   
@@ -82,16 +88,10 @@ export async function getPlaylists(spotify_user_id: string, access_token: string
     // Logic to playlists to array
     const playlists = response.data.items;
     
-    // Get name of monthly playlist 
-    const current_date = new Date();
-    const current_month = current_date.toLocaleString('default', { month: 'long' });
-    const current_year = current_date.getFullYear();
-    const playlist_name = `${current_month} ${current_year}`;
-
     playlists.forEach((playlist: any) => {
       // Only add non-collaborative playlists owned by the user, and skip monthly playlist
       if (playlist.collaborative === false && 
-        playlist.name !== playlist_name && 
+        playlist.name !== montly_playlist_name && 
         playlist.owner.id === spotify_user_id) {
         playlistIds.push(playlist.id);
       }
@@ -106,12 +106,22 @@ export async function getPlaylists(spotify_user_id: string, access_token: string
 
 // Function to get tracks from a playlist
 export async function getTracksFromPlaylist(access_token: string, playlist_id: string) {
+  // Array to store playlist tracks
   let tracks: string[] = [];
-  const response: AxiosResponse = await axios.get(``, {
-    headers: {
-        Authorization: `Bearer ${access_token}`,
-    },
-  });
+
+  // API endpoint for each request, updated with each response
+  let next: string | null = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks?limit=50&fields=next,items(added_at,added_by.id,track(name,id))`;
+
+  // Request 50 songs from playlist at a time
+  while (next) {
+    const response: AxiosResponse = await axios.get(`${next}`, {
+      headers: {
+          Authorization: `Bearer ${access_token}`,
+      },
+    });
+    (console.log(response.data.items));
+    next = response.data.next;
+  }
 }
 
 // Function to update user's monthly playlist
