@@ -46,7 +46,7 @@ export async function getUsers() {
     }
 }
 
-// Retrieve a particular user from their id
+// Retrieve a user from their id
 export async function getUserById(spotify_user_id: string) {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
@@ -63,7 +63,7 @@ export async function getUserById(spotify_user_id: string) {
     }
 }
 
-// Delete a particular user from their id
+// Delete a user from their id
 export async function deleteUser(spotify_user_id: string) {
     try {
         await pool.query(
@@ -84,7 +84,7 @@ export async function deleteUser(spotify_user_id: string) {
     }
 }
 
-// Update a particular user's monthly_playlist_id value
+// Update a user's monthly_playlist_id value
 export async function updateUsersMonthlyPlaylistId(
     spotify_user_id: string,
     monthly_playlist_id: string
@@ -109,7 +109,7 @@ export async function updateUsersMonthlyPlaylistId(
     }
 }
 
-// Update a particular user's monthly_playlist_id value
+// Update a user's monthly_playlist_id value
 export async function updateMonthify30Id(
     spotify_user_id: string,
     monthify_30_id: string

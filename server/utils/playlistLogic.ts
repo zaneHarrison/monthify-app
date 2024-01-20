@@ -5,6 +5,7 @@ import {
     updateMonthify30Id,
     getLastMonth,
     updateLastMonth,
+    getUserById,
 } from '../db.js'
 
 // API call to create the monthly playlist for a particular user
@@ -129,6 +130,7 @@ export async function getPlaylists(
             if (
                 playlist.collaborative === false &&
                 playlist.name !== montly_playlist_name &&
+                playlist.name !== 'Monthify 30' &&
                 playlist.owner.id === spotify_user_id
             ) {
                 playlistIds.push(playlist.id)
@@ -138,7 +140,6 @@ export async function getPlaylists(
         // Reasign variable to fetch next set of 50 playlists
         next = response.data.next
     }
-    console.log(playlistIds)
     return playlistIds
 }
 
@@ -161,7 +162,7 @@ export async function getTracksFromPlaylist(
 
     // API endpoint for each request, updated with each response
     let next: string | null =
-        `https://api.spotify.com/v1/playlists/${playlist_id}/tracks?limit=50&fields=next,items(added_at,added_by.id,track(name,id))`
+        `https://api.spotify.com/v1/playlists/${playlist_id}/tracks?limit=50&fields=next,items(added_at,added_by.id,track(name,id,uri))`
 
     // Request 50 songs from playlist at a time
     while (next) {
@@ -185,7 +186,6 @@ export async function getTracksFromPlaylist(
     }
 
     // Return list of tracks
-    console.log(tracks)
     return tracks
 }
 
@@ -194,7 +194,6 @@ export async function updatePlaylists(
     spotify_user_id: string,
     access_token: string
 ) {
-    // Update monthly playlist
     // First check if it's a new month
     const lastMonth = await getLastMonth()
     const currentMonth = new Date().getMonth()
@@ -204,5 +203,33 @@ export async function updatePlaylists(
         updateLastMonth(currentMonth)
         // Create new monthly playlist for user
         createMonthlyPlaylist(spotify_user_id, access_token)
+    }
+
+    // Get user's information
+    const user = await getUserById(spotify_user_id)
+    if (user) {
+        // Create set of tracks for monthly playlist
+        let monthly_playlist_tracks: Set<string>
+        // Create set of tracks for Monthify 30 playlist
+        let monthify_30_tracks: Set<string>
+
+        // Get list of user's playlists
+        const playlists: string[] = await getPlaylists(
+            spotify_user_id,
+            access_token
+        )
+        // Create array of potential tracks to add
+        let tracks: Object[] = []
+        // Populate array of potential tracks to add
+        for (const playlist_id of playlists) {
+            const playlistTracks = await getTracksFromPlaylist(
+                access_token,
+                playlist_id
+            )
+            tracks = tracks.concat(playlistTracks)
+        }
+
+        const monthly_playlist_id = user.monthly_playlist_id
+        const monthify_30_id = user.monthify_30_id
     }
 }
