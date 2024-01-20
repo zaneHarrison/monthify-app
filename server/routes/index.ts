@@ -133,11 +133,9 @@ export function createServerRoutes(app: Express) {
                                     console.log(
                                         `Creating current month's playlist for user ${spotify_user_id}`
                                     )
-                                    const current_date = new Date()
                                     createMonthlyPlaylist(
                                         spotify_user_id,
-                                        access_token,
-                                        current_date
+                                        access_token
                                     )
 
                                     // b) Create Monthify 30 playlist
