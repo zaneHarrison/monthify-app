@@ -59,11 +59,8 @@ const task = new Task("test-task", async () => {
       })
         .then((response: AxiosResponse) => {
           const access_token = response.data.access_token;
-          //getPlaylists(spotify_id, access_token);
-          // getTracksFromPlaylist(
-          //     access_token,
-          //     '0bYGcx0QW3w2RKYxdCF1AL'
-          // )
+          // getPlaylists(spotify_id, access_token);
+          getTracksFromPlaylist(access_token, "0bYGcx0QW3w2RKYxdCF1AL");
         })
         .catch((error: AxiosError) => {
           console.log(error);
