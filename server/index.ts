@@ -7,12 +7,14 @@ import cookieParser from 'cookie-parser'
 import { getLastMonth, getUsers } from './db.js'
 import { ToadScheduler, SimpleIntervalJob, Task } from 'toad-scheduler'
 import {
+    getLikedSongs,
     getPlaylists,
     getTracksFromPlaylist,
     updatePlaylists,
 } from './utils/playlistLogic.js'
 import { RowDataPacket } from 'mysql2'
 import { createServerRoutes } from './routes/index.js'
+import { access } from 'fs'
 
 // Enable the use of environment variables
 dotenv.config({ path: '../config.env' })
@@ -63,12 +65,13 @@ const task = new Task('test-task', async () => {
             })
                 .then((response: AxiosResponse) => {
                     const access_token = response.data.access_token
-                    // getPlaylists(spotify_id, access_token);
+                    // getPlaylists(spotify_id, access_token)
                     // getTracksFromPlaylist(
                     //     access_token,
                     //     '0bYGcx0QW3w2RKYxdCF1AL'
                     // )
-                    updatePlaylists(spotify_id, access_token)
+                    //updatePlaylists(spotify_id, access_token)
+                    getLikedSongs(access_token)
                 })
                 .catch((error: AxiosError) => {
                     console.log(error)

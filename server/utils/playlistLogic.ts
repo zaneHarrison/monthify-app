@@ -8,6 +8,17 @@ import {
     getUserById,
 } from '../db.js'
 
+// Define Track interface
+interface Track {
+    added_at: string
+    added_by: { id: string }
+    track: {
+        id: string
+        name: string
+        uri: string
+    }
+}
+
 // API call to create the monthly playlist for a particular user
 export async function createMonthlyPlaylist(
     spotify_user_id: string,
@@ -143,22 +154,22 @@ export async function getPlaylists(
     return playlistIds
 }
 
+// Function to check if a date is more than X days ago
+function isMoreThanXDaysAgo(dateString: string, numDays: number): boolean {
+    const dateToCheck = new Date(dateString)
+    const currentDate = new Date()
+    const timeDifference = currentDate.getTime() - dateToCheck.getTime()
+    const daysDifference = timeDifference / (1000 * 60 * 60 * 24)
+    return daysDifference > numDays
+}
+
 // Function to get tracks from a playlist
 export async function getTracksFromPlaylist(
     access_token: string,
     playlist_id: string
-) {
-    // Array to store playlist tracks
-    let tracks: Object[] = []
-
-    // Function to check if a date is more than 30 days ago
-    const isMoreThan30DaysAgo = (dateString: string): boolean => {
-        const dateToCheck = new Date(dateString)
-        const currentDate = new Date()
-        const timeDifference = currentDate.getTime() - dateToCheck.getTime()
-        const daysDifference = timeDifference / (1000 * 60 * 60 * 24)
-        return daysDifference > 31
-    }
+): Promise<Set<Track>> {
+    // Set to store playlist tracks
+    let tracks: Set<Track> = new Set()
 
     // API endpoint for each request, updated with each response
     let next: string | null =
@@ -171,13 +182,13 @@ export async function getTracksFromPlaylist(
                 Authorization: `Bearer ${access_token}`,
             },
         })
-        // Add tracks to list
-        tracks = tracks.concat(response.data.items)
+        // Add tracks to set
+        tracks = new Set([...tracks, ...response.data.items])
 
         // Stop looping if the last track of the current batch was added more than 30 days ago
         const tracksResponse = response.data.items
         const lastTrack = tracksResponse[tracksResponse.length - 1]
-        if (isMoreThan30DaysAgo(lastTrack.added_at)) {
+        if (isMoreThanXDaysAgo(lastTrack.added_at, 31)) {
             break
         }
 
@@ -185,8 +196,25 @@ export async function getTracksFromPlaylist(
         next = response.data.next
     }
 
-    // Return list of tracks
+    // Return set of tracks
     return tracks
+}
+
+// Function to check whether two dates have the same month and year
+function haveSameMonthAndYear(
+    dateString1: string,
+    dateString2: string
+): boolean {
+    const date1 = new Date(dateString1)
+    const date2 = new Date(dateString2)
+
+    const year1 = date1.getUTCFullYear()
+    const month1 = date1.getUTCMonth()
+
+    const year2 = date2.getUTCFullYear()
+    const month2 = date2.getUTCMonth()
+
+    return year1 === year2 && month1 === month2
 }
 
 // Function to update user's monthly playlist
@@ -200,36 +228,80 @@ export async function updatePlaylists(
     // If it's a new month
     if (lastMonth !== currentMonth) {
         // Update last month in database
-        updateLastMonth(currentMonth)
+        await updateLastMonth(currentMonth)
         // Create new monthly playlist for user
-        createMonthlyPlaylist(spotify_user_id, access_token)
+        await createMonthlyPlaylist(spotify_user_id, access_token)
     }
 
     // Get user's information
     const user = await getUserById(spotify_user_id)
     if (user) {
         // Create set of tracks for monthly playlist
-        let monthly_playlist_tracks: Set<string>
+        let monthly_playlist_tracks: Set<string> = new Set()
         // Create set of tracks for Monthify 30 playlist
-        let monthify_30_tracks: Set<string>
+        let monthify_30_tracks: Set<string> = new Set()
 
         // Get list of user's playlists
         const playlists: string[] = await getPlaylists(
             spotify_user_id,
             access_token
         )
-        // Create array of potential tracks to add
-        let tracks: Object[] = []
-        // Populate array of potential tracks to add
+        // Create set of potential tracks to add
+        let tracks: Set<Track> = new Set()
+        // Populate set of potential tracks to add
         for (const playlist_id of playlists) {
             const playlistTracks = await getTracksFromPlaylist(
                 access_token,
                 playlist_id
             )
-            tracks = tracks.concat(playlistTracks)
+            tracks = new Set([...tracks, ...playlistTracks])
         }
 
+        // Retrieve user's playlist ids
         const monthly_playlist_id = user.monthly_playlist_id
         const monthify_30_id = user.monthify_30_id
+
+        // Populate monthly playlist and Monthify 30 playlist
+        tracks.forEach((track: Track) => {
+            const current_date = new Date().toISOString()
+            //console.log('Current date: ' + current_date)
+            const date_added: string = track.added_at
+            //console.log('Song added date: ' + date_added)
+            if (haveSameMonthAndYear(current_date, date_added)) {
+                monthly_playlist_tracks.add(track.track.name)
+            }
+        })
+        //console.log(monthly_playlist_tracks)
+    }
+}
+
+// Function to get a user's liked songs
+export async function getLikedSongs(access_token: string) {
+    // Create set to hold tracks
+    let tracks: Set<Object> = new Set()
+
+    // Dynamic API endpoint
+    let next: string | null =
+        `https://api.spotify.com/v1/me/tracks?offset=0&limit=50`
+
+    // Get 50 songs at a time
+    while (next) {
+        const response: AxiosResponse = await axios.get(`${next}`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        })
+        // Add tracks to set
+        tracks = new Set([...tracks, ...response.data.items])
+
+        // Stop looping if the last track of the current batch was added more than 30 days ago
+        const tracksResponse = response.data.items
+        const lastTrack = tracksResponse[tracksResponse.length - 1]
+        if (isMoreThanXDaysAgo(lastTrack.added_at, 31)) {
+            break
+        }
+
+        // Reassign endpoint
+        next = response.data.next
     }
 }
