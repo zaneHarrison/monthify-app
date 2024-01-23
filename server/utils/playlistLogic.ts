@@ -241,8 +241,8 @@ function haveSameMonthAndYear(
     return year1 === year2 && month1 === month2
 }
 
-// Function to get a list of tracks for monthly playlist
-async function getMonthlyPlaylistTracks(
+// Function to get a list of potential tracks for monthly and Monthify 30 playlists
+async function getPotentialTracks(
     spotify_user_id: string,
     access_token: string
 ) {
@@ -270,24 +270,10 @@ async function getMonthlyPlaylistTracks(
         const likedSongs = await getLikedSongs(access_token, spotify_user_id)
         tracks = new Set([...tracks, ...likedSongs])
 
-        // Retrieve user's playlist id
-        const monthly_playlist_id = user.monthly_playlist_id
-
-        // Populate monthly playlist and Monthify 30 playlist
-        tracks.forEach((track: Track) => {
-            const current_date = new Date().toISOString()
-            //console.log('Current date: ' + current_date)
-            const date_added: string = track.added_at
-            //console.log('Song added date: ' + date_added)
-            if (haveSameMonthAndYear(current_date, date_added)) {
-                monthly_playlist_tracks.add(track.track.name)
-            }
-        })
-        console.log(monthly_playlist_tracks)
+        return tracks
     }
+    return new Set<Track>()
 }
-
-async function getMonthify30Tracks() {}
 
 // Function to update user's monthly playlist
 export async function updatePlaylists(
@@ -304,7 +290,31 @@ export async function updatePlaylists(
         // Create new monthly playlist for user
         await createMonthlyPlaylist(spotify_user_id, access_token)
     }
-    getMonthlyPlaylistTracks(spotify_user_id, access_token)
+
+    // Get potential songs for montly playlist and Monthify 30 playlist
+    const potentialTracks: Set<Track> = await getPotentialTracks(
+        spotify_user_id,
+        access_token
+    )
+
+    // Set to hold monthly playlist tracks
+    const monthly_playlist_tracks: Set<string> = new Set()
+    // Set to hold Monthify 30 tracks
+    const monthify_30_tracks: Set<string> = new Set()
+
+    // Populate monthly playlist and Monthify 30 playlist
+    potentialTracks.forEach((track: Track) => {
+        const current_date = new Date().toISOString()
+        //console.log('Current date: ' + current_date)
+        const date_added: string = track.added_at
+        //console.log('Song added date: ' + date_added)
+        if (haveSameMonthAndYear(current_date, date_added)) {
+            monthly_playlist_tracks.add(track.track.name)
+        }
+        if (!isMoreThanXDaysAgo(date_added, 30)) {
+            monthify_30_tracks.add(track.track.name)
+        }
+    })
 }
 
 // Function to get a user's liked songs
