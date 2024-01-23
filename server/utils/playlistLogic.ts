@@ -8,6 +8,30 @@ import {
     getUserById,
 } from '../db.js'
 
+// Define Spotify track interface
+interface SpotifyTrack {
+    added_at: string
+    track: {
+        album: any[]
+        artists: any[]
+        available_markets: any[]
+        disc_number: number
+        duration_ms: number
+        explicit: boolean
+        external_ids: any
+        external_urls: any
+        href: string
+        id: string
+        is_local: boolean
+        name: string
+        popularity: number
+        preview_url: string
+        track_number: number
+        type: string
+        uri: string
+    }
+}
+
 // Define Track interface
 interface Track {
     added_at: string
@@ -185,7 +209,7 @@ export async function getTracksFromPlaylist(
         // Add tracks to set
         tracks = new Set([...tracks, ...response.data.items])
 
-        // Stop looping if the last track of the current batch was added more than 30 days ago
+        // Stop looping if the last track of the current batch was added more than 31 days ago
         const tracksResponse = response.data.items
         const lastTrack = tracksResponse[tracksResponse.length - 1]
         if (isMoreThanXDaysAgo(lastTrack.added_at, 31)) {
@@ -248,7 +272,7 @@ export async function updatePlaylists(
         )
         // Create set of potential tracks to add
         let tracks: Set<Track> = new Set()
-        // Populate set of potential tracks to add
+        // Populate set of potential tracks to add using playlists
         for (const playlist_id of playlists) {
             const playlistTracks = await getTracksFromPlaylist(
                 access_token,
@@ -256,6 +280,9 @@ export async function updatePlaylists(
             )
             tracks = new Set([...tracks, ...playlistTracks])
         }
+        // Add user's liked songs to set of potential tracks to add
+        const likedSongs = await getLikedSongs(access_token, spotify_user_id)
+        tracks = new Set([...tracks, ...likedSongs])
 
         // Retrieve user's playlist ids
         const monthly_playlist_id = user.monthly_playlist_id
@@ -271,14 +298,17 @@ export async function updatePlaylists(
                 monthly_playlist_tracks.add(track.track.name)
             }
         })
-        //console.log(monthly_playlist_tracks)
+        console.log(monthly_playlist_tracks)
     }
 }
 
 // Function to get a user's liked songs
-export async function getLikedSongs(access_token: string) {
+export async function getLikedSongs(
+    access_token: string,
+    spotify_user_id: string
+) {
     // Create set to hold tracks
-    let tracks: Set<Object> = new Set()
+    let tracks: Set<Track> = new Set()
 
     // Dynamic API endpoint
     let next: string | null =
@@ -291,10 +321,25 @@ export async function getLikedSongs(access_token: string) {
                 Authorization: `Bearer ${access_token}`,
             },
         })
-        // Add tracks to set
-        tracks = new Set([...tracks, ...response.data.items])
+        // Convert response tracks to form of Track interface
+        let responseTracks: Set<Track> = new Set()
+        response.data.items.forEach((track: SpotifyTrack) => {
+            const transformedTrack: Track = {
+                added_at: track.added_at,
+                added_by: { id: spotify_user_id },
+                track: {
+                    id: track.track.id,
+                    name: track.track.name,
+                    uri: track.track.uri,
+                },
+            }
+            responseTracks.add(transformedTrack)
+        })
 
-        // Stop looping if the last track of the current batch was added more than 30 days ago
+        // Add tracks to set
+        tracks = new Set([...tracks, ...responseTracks])
+
+        // Stop looping if the last track of the current batch was added more than 31 days ago
         const tracksResponse = response.data.items
         const lastTrack = tracksResponse[tracksResponse.length - 1]
         if (isMoreThanXDaysAgo(lastTrack.added_at, 31)) {
@@ -304,4 +349,5 @@ export async function getLikedSongs(access_token: string) {
         // Reassign endpoint
         next = response.data.next
     }
+    return tracks
 }

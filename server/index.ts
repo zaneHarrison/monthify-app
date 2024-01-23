@@ -70,8 +70,8 @@ const task = new Task('test-task', async () => {
                     //     access_token,
                     //     '0bYGcx0QW3w2RKYxdCF1AL'
                     // )
-                    //updatePlaylists(spotify_id, access_token)
-                    getLikedSongs(access_token)
+                    updatePlaylists(spotify_id, access_token)
+                    // getLikedSongs(access_token, spotify_id)
                 })
                 .catch((error: AxiosError) => {
                     console.log(error)
