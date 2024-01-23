@@ -241,30 +241,16 @@ function haveSameMonthAndYear(
     return year1 === year2 && month1 === month2
 }
 
-// Function to update user's monthly playlist
-export async function updatePlaylists(
+// Function to get a list of tracks for monthly playlist
+async function getMonthlyPlaylistTracks(
     spotify_user_id: string,
     access_token: string
 ) {
-    // First check if it's a new month
-    const lastMonth = await getLastMonth()
-    const currentMonth = new Date().getMonth()
-    // If it's a new month
-    if (lastMonth !== currentMonth) {
-        // Update last month in database
-        await updateLastMonth(currentMonth)
-        // Create new monthly playlist for user
-        await createMonthlyPlaylist(spotify_user_id, access_token)
-    }
-
     // Get user's information
     const user = await getUserById(spotify_user_id)
     if (user) {
         // Create set of tracks for monthly playlist
         let monthly_playlist_tracks: Set<string> = new Set()
-        // Create set of tracks for Monthify 30 playlist
-        let monthify_30_tracks: Set<string> = new Set()
-
         // Get list of user's playlists
         const playlists: string[] = await getPlaylists(
             spotify_user_id,
@@ -284,9 +270,8 @@ export async function updatePlaylists(
         const likedSongs = await getLikedSongs(access_token, spotify_user_id)
         tracks = new Set([...tracks, ...likedSongs])
 
-        // Retrieve user's playlist ids
+        // Retrieve user's playlist id
         const monthly_playlist_id = user.monthly_playlist_id
-        const monthify_30_id = user.monthify_30_id
 
         // Populate monthly playlist and Monthify 30 playlist
         tracks.forEach((track: Track) => {
@@ -300,6 +285,26 @@ export async function updatePlaylists(
         })
         console.log(monthly_playlist_tracks)
     }
+}
+
+async function getMonthify30Tracks() {}
+
+// Function to update user's monthly playlist
+export async function updatePlaylists(
+    spotify_user_id: string,
+    access_token: string
+) {
+    // First check if it's a new month
+    const lastMonth = await getLastMonth()
+    const currentMonth = new Date().getMonth()
+    // If it's a new month
+    if (lastMonth !== currentMonth) {
+        // Update last month in database
+        await updateLastMonth(currentMonth)
+        // Create new monthly playlist for user
+        await createMonthlyPlaylist(spotify_user_id, access_token)
+    }
+    getMonthlyPlaylistTracks(spotify_user_id, access_token)
 }
 
 // Function to get a user's liked songs
