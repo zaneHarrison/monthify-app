@@ -44,7 +44,7 @@ const scheduler = new ToadScheduler()
 
 // Define scheduled task to run
 const task = new Task('test-task', async () => {
-    console.log('TASK STARTING')
+    //console.log('TASK STARTING')
     // Get all users from database
     getUsers().then((response: RowDataPacket[]) => {
         response.forEach((user) => {

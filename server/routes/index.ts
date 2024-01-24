@@ -90,7 +90,7 @@ export function createServerRoutes(app: Express) {
                     const { refresh_token, access_token, token_type } =
                         response.data
 
-                    // Fetch current user information
+                    // Fetch current user's information
                     console.log('Fetching user spotify profile data')
                     axios
                         .get('https://api.spotify.com/v1/me', {

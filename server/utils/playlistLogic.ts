@@ -212,7 +212,13 @@ export async function getTracksFromPlaylist(
         // Stop looping if the last track of the current batch was added more than 31 days ago
         const tracksResponse = response.data.items
         const lastTrack = tracksResponse[tracksResponse.length - 1]
-        if (isMoreThanXDaysAgo(lastTrack.added_at, 31)) {
+        if (lastTrack === undefined) break
+        // Assign added_at old value if null
+        const lastTrackAddedAt =
+            lastTrack.added_at !== null
+                ? lastTrack.added_at
+                : '2000-01-01T00:00:00Z'
+        if (isMoreThanXDaysAgo(lastTrackAddedAt, 31)) {
             break
         }
 
@@ -306,7 +312,8 @@ export async function updatePlaylists(
     potentialTracks.forEach((track: Track) => {
         const current_date = new Date().toISOString()
         //console.log('Current date: ' + current_date)
-        const date_added: string = track.added_at
+        const date_added: string =
+            track.added_at !== null ? track.added_at : '2000-01-01T00:00:00Z'
         //console.log('Song added date: ' + date_added)
         if (haveSameMonthAndYear(current_date, date_added)) {
             monthly_playlist_tracks.add(track.track.name)
@@ -315,6 +322,14 @@ export async function updatePlaylists(
             monthify_30_tracks.add(track.track.name)
         }
     })
+
+    // Get user's monthly playlist and Monthify 30 playlist ids
+    const user = await getUserById(spotify_user_id)
+    if (user) {
+        const monthly_playlist_id = user.monthly_playlist_id
+        const monthify_30_id = user.monthify_30_id
+    }
+    console.log(monthify_30_tracks)
 }
 
 // Function to get a user's liked songs
@@ -339,8 +354,12 @@ export async function getLikedSongs(
         // Convert response tracks to form of Track interface
         let responseTracks: Set<Track> = new Set()
         response.data.items.forEach((track: SpotifyTrack) => {
+            const track_added_at =
+                track.added_at !== null
+                    ? track.added_at
+                    : '2000-01-01T00:00:00Z'
             const transformedTrack: Track = {
-                added_at: track.added_at,
+                added_at: track_added_at,
                 added_by: { id: spotify_user_id },
                 track: {
                     id: track.track.id,
@@ -357,7 +376,14 @@ export async function getLikedSongs(
         // Stop looping if the last track of the current batch was added more than 31 days ago
         const tracksResponse = response.data.items
         const lastTrack = tracksResponse[tracksResponse.length - 1]
-        if (isMoreThanXDaysAgo(lastTrack.added_at, 31)) {
+        if (lastTrack === undefined) break
+        // Assign added_at old value if null
+        const lastTrackAddedAt =
+            lastTrack.added_at !== null
+                ? lastTrack.added_at
+                : '2000-01-01T00:00:00Z'
+
+        if (isMoreThanXDaysAgo(lastTrackAddedAt, 31)) {
             break
         }
 
