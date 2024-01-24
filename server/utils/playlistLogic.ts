@@ -265,13 +265,13 @@ async function getPotentialTracks(
         // Create set of potential tracks to add
         let tracks: Set<Track> = new Set()
         // Populate set of potential tracks to add using playlists
-        for (const playlist_id of playlists) {
-            const playlistTracks = await getTracksFromPlaylist(
-                access_token,
-                playlist_id
-            )
-            tracks = new Set([...tracks, ...playlistTracks])
-        }
+        // for (const playlist_id of playlists) {
+        //     const playlistTracks = await getTracksFromPlaylist(
+        //         access_token,
+        //         playlist_id
+        //     )
+        //     tracks = new Set([...tracks, ...playlistTracks])
+        // }
         // Add user's liked songs to set of potential tracks to add
         const likedSongs = await getLikedSongs(access_token, spotify_user_id)
         tracks = new Set([...tracks, ...likedSongs])
@@ -304,9 +304,9 @@ export async function updatePlaylists(
     )
 
     // Set to hold monthly playlist tracks
-    const monthly_playlist_tracks: Set<string> = new Set()
+    const monthly_playlist_tracks_set: Set<string> = new Set()
     // Set to hold Monthify 30 tracks
-    const monthify_30_tracks: Set<string> = new Set()
+    const monthify_30_tracks_set: Set<string> = new Set()
 
     // Populate monthly playlist and Monthify 30 playlist
     potentialTracks.forEach((track: Track) => {
@@ -316,20 +316,33 @@ export async function updatePlaylists(
             track.added_at !== null ? track.added_at : '2000-01-01T00:00:00Z'
         //console.log('Song added date: ' + date_added)
         if (haveSameMonthAndYear(current_date, date_added)) {
-            monthly_playlist_tracks.add(track.track.name)
+            monthly_playlist_tracks_set.add(track.track.uri)
         }
         if (!isMoreThanXDaysAgo(date_added, 30)) {
-            monthify_30_tracks.add(track.track.name)
+            monthify_30_tracks_set.add(track.track.uri)
         }
     })
+
+    // Convert sets to lists
+    const monthly_playlist_tracks = Array.from(monthly_playlist_tracks_set)
+    const monthify_30_tracks = Array.from(monthify_30_tracks_set)
 
     // Get user's monthly playlist and Monthify 30 playlist ids
     const user = await getUserById(spotify_user_id)
     if (user) {
         const monthly_playlist_id = user.monthly_playlist_id
         const monthify_30_id = user.monthify_30_id
+
+        // Call functions to update playlists
+        // Update monthly playlist
+        updateSpotifyPlaylist(
+            access_token,
+            monthly_playlist_id,
+            monthly_playlist_tracks
+        )
+        // Update Monthify 30 playlist
+        updateSpotifyPlaylist(access_token, monthify_30_id, monthify_30_tracks)
     }
-    console.log(monthify_30_tracks)
 }
 
 // Function to get a user's liked songs
@@ -391,4 +404,32 @@ export async function getLikedSongs(
         next = response.data.next
     }
     return tracks
+}
+
+// Function to update the contents of a playlist
+export async function updateSpotifyPlaylist(
+    access_token: string,
+    playlist_id: string,
+    trackUris: string[]
+) {
+    // Define request endpoint
+    const endpoint: string = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`
+    // API call to update playlist
+    try {
+        await axios.put(
+            endpoint,
+            {
+                uris: trackUris,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        console.log('Playlist updated successfully')
+    } catch (error) {
+        console.log(`Error updating playlist: ${error}`)
+    }
 }
