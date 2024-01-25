@@ -7,6 +7,7 @@ import {
     updateLastMonth,
     getUserById,
 } from '../db.js'
+import fs from 'fs'
 
 // Define Spotify track interface
 interface SpotifyTrack {
@@ -96,7 +97,7 @@ export async function createMonthify30Playlist(
     access_token: string
 ) {
     // Create playlist via API call
-    axios
+    await axios
         .post(
             `https://api.spotify.com/v1/users/${spotify_user_id}/playlists`,
             {
@@ -122,12 +123,43 @@ export async function createMonthify30Playlist(
             console.log(
                 `Successfully updated monthly_30_id value for user with username ${spotify_user_id}`
             )
+
+            // Add playlist image for Monthify 30 playlist
+            const base64Encoding = fs.readFileSync(
+                './public/monthify30CoverImage.txt',
+                'utf-8'
+            )
+            updatePlaylistImage(base64Encoding, monthify_30_id, access_token)
+
             return response.data.id
         })
         .catch((error: AxiosError) => {
             console.log(`Error: ${error}`)
         })
+
     return
+}
+
+export async function updatePlaylistImage(
+    base64Encoding: string,
+    playlist_id: string,
+    access_token: string
+) {
+    try {
+        await axios.put(
+            `https://api.spotify.com/v1/playlists/${playlist_id}/images`,
+            base64Encoding,
+            {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                    'Content-Type': 'image/jpeg',
+                },
+            }
+        )
+        console.log(`Successfully set Monthify 30 playlist image`)
+    } catch (error) {
+        console.log(`Error setting Monthify 30 playlist image: ${error}`)
+    }
 }
 
 // Function to generate a list of playlists for a particular user

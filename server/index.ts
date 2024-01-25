@@ -41,28 +41,30 @@ const task = new Task('test-task', async () => {
     // Get all users from database
     getUsers().then((response: RowDataPacket[]) => {
         response.forEach((user) => {
-            const spotify_id = user.spotify_user_id
-            const refresh_token = user.refresh_token
-            // Use user's refresh token to get access token
-            axios({
-                method: 'post',
-                url: 'https://accounts.spotify.com/api/token',
-                data: querystring.stringify({
-                    grant_type: 'refresh_token',
-                    refresh_token: refresh_token,
-                }),
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded',
-                    Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-                },
-            })
-                .then((response: AxiosResponse) => {
-                    const access_token = response.data.access_token
-                    updateMonthifyPlaylists(spotify_id, access_token)
+            if (user.spotify_display_name === 'zane.harrison') {
+                const spotify_id = user.spotify_user_id
+                const refresh_token = user.refresh_token
+                // Use user's refresh token to get access token
+                axios({
+                    method: 'post',
+                    url: 'https://accounts.spotify.com/api/token',
+                    data: querystring.stringify({
+                        grant_type: 'refresh_token',
+                        refresh_token: refresh_token,
+                    }),
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded',
+                        Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+                    },
                 })
-                .catch((error: AxiosError) => {
-                    console.log(error)
-                })
+                    .then((response: AxiosResponse) => {
+                        const access_token = response.data.access_token
+                        updateMonthifyPlaylists(spotify_id, access_token)
+                    })
+                    .catch((error: AxiosError) => {
+                        console.log(error)
+                    })
+            }
         })
     })
 })

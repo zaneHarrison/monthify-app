@@ -30,7 +30,7 @@ export function createServerRoutes(app: Express) {
 
         // Define authorized access levels for application
         const scope =
-            'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-private user-read-email user-library-read'
+            'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-private user-read-email user-library-read ugc-image-upload'
 
         // Build query string
         const queryParams: string = querystring.stringify({
