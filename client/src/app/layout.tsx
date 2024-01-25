@@ -18,6 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <title>Monthify</title>
+        <link rel="icon" href="../icon.ico"></link>
       </head>
       <body className={inter.className}>{children}</body>
     </html>
