@@ -281,8 +281,8 @@ async function getPotentialTracks(
     return new Set<Track>()
 }
 
-// Function to update user's monthly playlist
-export async function updatePlaylists(
+// Function to update user's Monthify playlists
+export async function updateMonthifyPlaylists(
     spotify_user_id: string,
     access_token: string
 ) {

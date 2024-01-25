@@ -4,17 +4,11 @@ import querystring from 'querystring'
 import axios from 'axios'
 import { AxiosError, AxiosResponse } from 'axios'
 import cookieParser from 'cookie-parser'
-import { getLastMonth, getUsers } from './db.js'
+import { getUsers } from './db.js'
 import { ToadScheduler, SimpleIntervalJob, Task } from 'toad-scheduler'
-import {
-    getLikedSongs,
-    getPlaylists,
-    getTracksFromPlaylist,
-    updatePlaylists,
-} from './utils/playlistLogic.js'
+import { updateMonthifyPlaylists } from './utils/playlistLogic.js'
 import { RowDataPacket } from 'mysql2'
 import { createServerRoutes } from './routes/index.js'
-import { access } from 'fs'
 
 // Enable the use of environment variables
 dotenv.config({ path: '../config.env' })
@@ -44,7 +38,6 @@ const scheduler = new ToadScheduler()
 
 // Define scheduled task to run
 const task = new Task('test-task', async () => {
-    //console.log('TASK STARTING')
     // Get all users from database
     getUsers().then((response: RowDataPacket[]) => {
         response.forEach((user) => {
@@ -65,13 +58,7 @@ const task = new Task('test-task', async () => {
             })
                 .then((response: AxiosResponse) => {
                     const access_token = response.data.access_token
-                    // getPlaylists(spotify_id, access_token)
-                    // getTracksFromPlaylist(
-                    //     access_token,
-                    //     '0bYGcx0QW3w2RKYxdCF1AL'
-                    // )
-                    updatePlaylists(spotify_id, access_token)
-                    // getLikedSongs(access_token, spotify_id)
+                    updateMonthifyPlaylists(spotify_id, access_token)
                 })
                 .catch((error: AxiosError) => {
                     console.log(error)
