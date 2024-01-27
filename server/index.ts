@@ -38,13 +38,15 @@ const scheduler = new ToadScheduler()
 
 // Define scheduled task to run
 const task = new Task('test-task', async () => {
-    // Get all users from database
+    // Iterate over each user in the database
     getUsers().then((response: RowDataPacket[]) => {
         response.forEach((user) => {
             if (user.spotify_display_name === 'zane.harrison') {
+                // Get user information
                 const spotify_id = user.spotify_user_id
                 const refresh_token = user.refresh_token
-                // Use user's refresh token to get access token
+
+                // Use user's refresh token to retrieve access token
                 axios({
                     method: 'post',
                     url: 'https://accounts.spotify.com/api/token',
@@ -59,6 +61,7 @@ const task = new Task('test-task', async () => {
                 })
                     .then((response: AxiosResponse) => {
                         const access_token = response.data.access_token
+                        // Use access token to update their Monthify playlists
                         updateMonthifyPlaylists(spotify_id, access_token)
                     })
                     .catch((error: AxiosError) => {
@@ -69,5 +72,6 @@ const task = new Task('test-task', async () => {
     })
 })
 
+// Define and add scheduled job
 const job = new SimpleIntervalJob({ seconds: 5 }, task)
 scheduler.addSimpleIntervalJob(job)

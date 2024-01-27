@@ -19,10 +19,12 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET
 const REDIRECT_URI = process.env.REDIRECT_URI
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL
 
+// Expose backend routes
 export function createServerRoutes(app: Express) {
     // Use variable to track state
     const stateKey = 'spotify_auth_state'
 
+    // Route for user sign up
     app.get('/login', (req: Request, res: Response) => {
         // Generate state value and store in cookie
         const state = generateRandomString(16)
@@ -53,7 +55,7 @@ export function createServerRoutes(app: Express) {
         const state = (req.query.state as string) || null
         if (state !== 'optOut' && state !== req.cookies[stateKey]) {
             console.log(
-                'States do not match. Ending authorization flow and redirecting user to error page.'
+                'States do not match. Ending authorization flow and redirecting user to error page'
             )
             res.redirect(`${CLIENT_BASE_URL}/error`)
             return
@@ -62,7 +64,7 @@ export function createServerRoutes(app: Express) {
         // Redirect user to homepage if they deny authorization
         const error = (req.query.error as string) || undefined
         if (error) {
-            console.log('Authorization denied. Redirecting user to homepage.')
+            console.log('Authorization denied. Redirecting user to homepage')
             res.redirect(`${CLIENT_BASE_URL}`)
             return
         }
@@ -106,7 +108,7 @@ export function createServerRoutes(app: Express) {
                             // Delete user from database if they are opting out
                             if (state === 'optOut') {
                                 console.log(
-                                    `User has chosen to opt-out, deleting user ${spotify_user_id} from database.`
+                                    `User has chosen to opt-out, deleting user ${spotify_user_id} from database`
                                 )
                                 deleteUser(spotify_user_id)
                                 res.redirect(
@@ -148,6 +150,9 @@ export function createServerRoutes(app: Express) {
                                     )
 
                                     // 2) Add user to database
+                                    console.log(
+                                        `Adding user ${spotify_user_id} to database`
+                                    )
                                     createUser(
                                         spotify_display_name,
                                         spotify_user_id,

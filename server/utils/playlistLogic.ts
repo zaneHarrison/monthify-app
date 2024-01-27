@@ -57,13 +57,14 @@ export async function createMonthlyPlaylist(
     })
     const current_year = current_date.getFullYear()
     const playlist_name = `${current_month} ${current_year}`
+
     // Create playlist via API call
     axios
         .post(
             `https://api.spotify.com/v1/users/${spotify_user_id}/playlists`,
             {
                 name: playlist_name,
-                description: `An automatically generated collection of tracks you've added to your playlists in ${current_month} of ${current_year}.`,
+                description: `An automatically generated collection of tracks you've liked in ${current_month} of ${current_year}`,
                 public: false,
             },
             {
@@ -80,9 +81,6 @@ export async function createMonthlyPlaylist(
             // Store playlist ID in database
             const monthly_playlist_id = response.data.id
             updateUsersMonthlyPlaylistId(spotify_user_id, monthly_playlist_id)
-            console.log(
-                `Successfully updated monthly_playlist_id value for user with username ${spotify_user_id}`
-            )
             return response.data.id
         })
         .catch((error: AxiosError) => {
@@ -103,7 +101,7 @@ export async function createMonthify30Playlist(
             {
                 name: 'Monthify 30',
                 description:
-                    'An automatically curated playlist of your tracks from the past 30 days.',
+                    "An automatically generated collection of tracks you've liked in the past 30 days",
                 public: false,
             },
             {
@@ -120,9 +118,6 @@ export async function createMonthify30Playlist(
             // Store playlist ID in database
             const monthify_30_id = response.data.id
             updateMonthify30Id(spotify_user_id, monthify_30_id)
-            console.log(
-                `Successfully updated monthly_30_id value for user with username ${spotify_user_id}`
-            )
 
             // Add playlist image for Monthify 30 playlist
             const base64Encoding = fs.readFileSync(
@@ -146,6 +141,7 @@ export async function updatePlaylistImage(
     access_token: string
 ) {
     try {
+        // API call to upload playlist image
         await axios.put(
             `https://api.spotify.com/v1/playlists/${playlist_id}/images`,
             base64Encoding,
@@ -157,11 +153,19 @@ export async function updatePlaylistImage(
             }
         )
         console.log(`Successfully set Monthify 30 playlist image`)
-    } catch (error) {
+    } catch (error: any) {
+        // Retry image update in the case of a 503 error
+        if (error.response && error.response.status === 503) {
+            // Wait 1 second
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+            // Retry image update
+            await updatePlaylistImage(base64Encoding, playlist_id, access_token)
+        }
         console.log(`Error setting Monthify 30 playlist image: ${error}`)
     }
 }
 
+// THIS FUNCTION IS CURRENTLY UNUSED. MONTHIFY IS ONLY CONSIDERING TRACKS FROM EACH USERS' LIKED SONGS RATHER THAN FROM EACH OF THEIR PLAYLISTS
 // Function to generate a list of playlists for a particular user
 export async function getPlaylists(
     spotify_user_id: string,
@@ -212,13 +216,16 @@ export async function getPlaylists(
 
 // Function to check if a date is more than X days ago
 function isMoreThanXDaysAgo(dateString: string, numDays: number): boolean {
+    // Compare dates
     const dateToCheck = new Date(dateString)
     const currentDate = new Date()
+    // Get time difference in seconds
     const timeDifference = currentDate.getTime() - dateToCheck.getTime()
     const daysDifference = timeDifference / (1000 * 60 * 60 * 24)
     return daysDifference > numDays
 }
 
+// THIS FUNCTION IS CURRENTLY UNUSED. MONTHIFY IS ONLY CONSIDERING TRACKS FROM EACH USERS' LIKED SONGS RATHER THAN FROM EACH OF THEIR PLAYLISTS
 // Function to get tracks from a playlist
 export async function getTracksFromPlaylist(
     access_token: string,
@@ -288,12 +295,14 @@ async function getPotentialTracks(
     const user = await getUserById(spotify_user_id)
     if (user) {
         // Create set of tracks for monthly playlist
-        let monthly_playlist_tracks: Set<string> = new Set()
+        // let monthly_playlist_tracks: Set<string> = new Set()
+
         // Get list of user's playlists
-        const playlists: string[] = await getPlaylists(
-            spotify_user_id,
-            access_token
-        )
+        // const playlists: string[] = await getPlaylists(
+        //     spotify_user_id,
+        //     access_token
+        // )
+
         // Create set of potential tracks to add
         let tracks: Set<Track> = new Set()
         // Populate set of potential tracks to add using playlists
@@ -304,6 +313,7 @@ async function getPotentialTracks(
         //     )
         //     tracks = new Set([...tracks, ...playlistTracks])
         // }
+
         // Add user's liked songs to set of potential tracks to add
         const likedSongs = await getLikedSongs(access_token, spotify_user_id)
         tracks = new Set([...tracks, ...likedSongs])
@@ -321,6 +331,7 @@ export async function updateMonthifyPlaylists(
     // First check if it's a new month
     const lastMonth = await getLastMonth()
     const currentMonth = new Date().getMonth()
+
     // If it's a new month
     if (lastMonth !== currentMonth) {
         // Update last month in database
@@ -343,13 +354,15 @@ export async function updateMonthifyPlaylists(
     // Populate monthly playlist and Monthify 30 playlist
     potentialTracks.forEach((track: Track) => {
         const current_date = new Date().toISOString()
-        //console.log('Current date: ' + current_date)
+        // Get track's date added, set to old value if null
         const date_added: string =
             track.added_at !== null ? track.added_at : '2000-01-01T00:00:00Z'
-        //console.log('Song added date: ' + date_added)
+
+        // Add track to monthly playlist set
         if (haveSameMonthAndYear(current_date, date_added)) {
             monthly_playlist_tracks_set.add(track.track.uri)
         }
+        // Add track to Monthify 30 set
         if (!isMoreThanXDaysAgo(date_added, 30)) {
             monthify_30_tracks_set.add(track.track.uri)
         }
@@ -365,7 +378,6 @@ export async function updateMonthifyPlaylists(
         const monthly_playlist_id = user.monthly_playlist_id
         const monthify_30_id = user.monthify_30_id
 
-        // Call functions to update playlists
         // Update monthly playlist
         updateSpotifyPlaylist(
             access_token,
@@ -396,13 +408,16 @@ export async function getLikedSongs(
                 Authorization: `Bearer ${access_token}`,
             },
         })
+
         // Convert response tracks to form of Track interface
         let responseTracks: Set<Track> = new Set()
         response.data.items.forEach((track: SpotifyTrack) => {
+            // Get track's date added, set to old value if null
             const track_added_at =
                 track.added_at !== null
                     ? track.added_at
                     : '2000-01-01T00:00:00Z'
+            // Convert SpotifyTrack object to Track object
             const transformedTrack: Track = {
                 added_at: track_added_at,
                 added_by: { id: spotify_user_id },
@@ -412,6 +427,7 @@ export async function getLikedSongs(
                     uri: track.track.uri,
                 },
             }
+            // Add track to running set
             responseTracks.add(transformedTrack)
         })
 
@@ -422,12 +438,13 @@ export async function getLikedSongs(
         const tracksResponse = response.data.items
         const lastTrack = tracksResponse[tracksResponse.length - 1]
         if (lastTrack === undefined) break
-        // Assign added_at old value if null
+        // Get track's date added, set to old value if null
         const lastTrackAddedAt =
             lastTrack.added_at !== null
                 ? lastTrack.added_at
                 : '2000-01-01T00:00:00Z'
 
+        // Break if last track of current batch was added more than 31 days ago
         if (isMoreThanXDaysAgo(lastTrackAddedAt, 31)) {
             break
         }
@@ -446,6 +463,7 @@ export async function updateSpotifyPlaylist(
 ) {
     // Define request endpoint
     const endpoint: string = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`
+
     // API call to update playlist
     try {
         await axios.put(

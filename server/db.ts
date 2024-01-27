@@ -28,7 +28,7 @@ export async function createUser(
             [spotify_display_name, spotify_user_id, refresh_token]
         )
         console.log(
-            `User ${spotify_display_name} successfully added to database.`
+            `User ${spotify_display_name} successfully added to database`
         )
     } catch (error) {
         console.error('Error inserting user into database:', error)
@@ -74,7 +74,7 @@ export async function deleteUser(spotify_user_id: string) {
             [spotify_user_id]
         )
         console.log(
-            `User with username ${spotify_user_id} deleted successfully.`
+            `User with username ${spotify_user_id} deleted successfully`
         )
     } catch (error) {
         console.error(
@@ -99,7 +99,7 @@ export async function updateUsersMonthlyPlaylistId(
             [monthly_playlist_id, spotify_user_id]
         )
         console.log(
-            `Successfully updated monthly_playlist_id value for user with username ${spotify_user_id}.`
+            `Successfully updated monthly_playlist_id value for user with username ${spotify_user_id}`
         )
     } catch (error) {
         console.error(
@@ -124,7 +124,7 @@ export async function updateMonthify30Id(
             [monthify_30_id, spotify_user_id]
         )
         console.log(
-            `Successfully updated monthify_30_id value for user with username ${spotify_user_id}.`
+            `Successfully updated monthify_30_id value for user with username ${spotify_user_id}`
         )
     } catch (error) {
         console.error(
@@ -136,7 +136,7 @@ export async function updateMonthify30Id(
 
 // MONTH TABLE
 
-// Update the current month
+// Update the last month value stored in database
 export async function updateLastMonth(last_month: number) {
     try {
         await pool.query(
@@ -145,13 +145,13 @@ export async function updateLastMonth(last_month: number) {
         `,
             [last_month]
         )
-        console.log(`Current month value updated to ${last_month} in database.`)
+        console.log(`Current month value updated to ${last_month} in database`)
     } catch (error) {
         console.error('Error updating current month value in database:', error)
     }
 }
 
-// Get the value of the last month stored in database
+// Get the last month value stored in database
 export async function getLastMonth() {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
