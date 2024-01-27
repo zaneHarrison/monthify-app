@@ -46,9 +46,26 @@ A "db.ts" file serves as the database connection and includes the logic for crea
 
 The MySQL database contains two tables, "users" and "month". The "users" table stores user information, and the "month" table simply stores the last recorded month so as to allow the application to know whether a new month has begun.
 <br></br>
-<br></br>
-Monthify is a personal project created by Zane Harrison.
 
+## Final Thoughts
+
+Monthify is the first full-stack web application that I've developed on my own, and I should mention that I am by no means an expert in any of the technologies used to create this project. As I embarked on this project, my mindset was to learn anything that I needed to learn as I developed, and that's exactly what I did. After finishing the project, I feel as though I've gained a much deeper understanding of the technologies and concepts that I did work with, and I feel that I've become a much better programmer as a result. 
+
+When starting programming projects, it's important to realize that you do not need to know how to do what you want to do when you start. Getting stuck, trying things out, and doing research to get unstuck is how you learn. Similarly, learning through acquiring new coding skills, watching YouTube videos, and reading about programming concepts is definitely a necessary component of improving as a developer, but at a certain point you need to dive into a project and try to build something. Embracing this mindset has significantly contributed to my growth as a developer.
+<br></br>
+
+## Helpful Resource
+
+Here is a short list of resources that I found useful when working on this project:
+* https://www.newline.co/courses/build-a-spotify-connected-app/implementing-the-authorization-code-flow
+* https://www.youtube.com/watch?v=Hej48pi_lOc 
+* https://developer.spotify.com/documentation/web-api 
+<br></br>
+<br></br>
+
+Monthify is a personal project created by Zane Harrison.
+<br></br>
+<br></br>
 <p align="center">
   <img width="463" height="646" src="https://github.com/zaneHarrison/monthify-app/assets/98977195/60bf25a4-40dc-4583-b3b1-77e1f2266502">
 </p>
