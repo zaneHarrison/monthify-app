@@ -19,6 +19,8 @@ Both the monthly playlists and the "Monthify 30" playlist will update multiple t
 To use Monthify, simply sign up via the website. You will be prompted to sign in with Spotify and to authorize access to your Spotify account. This enables Monthify to access your Spotify data and to make changes to your account (this is required for the playlist creation functionality). 
 
 Once signed up, you don't need to do anything else! Monthify will work behind the scenes to create and update your monthly playlists. 
+
+You can opt-out of Monthify at any time through the website. Opting-out will not delete any playlists that Monthify has created within your Spotify account. Rather, it will stop your playlists from being updated and will prevent Monthify from creating any new playlists within your account.
 <br></br>
 
 ## Technical Details 
