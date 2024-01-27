@@ -19,12 +19,33 @@ export function LearnMoreSection() {
       <div id="learn-more-text" className={styles.learnMoreTextContainer}>
         <p className={light.className}>
           After signing up with the button above, Monthify will access your
-          Spotify playlist data to identify any songs you’ve added to any of
-          your playlists during the current month. It will then add these songs
-          to a new playlist titled “current month, current year”. For example,
-          “December, 2023”. This monthly playlist will be updated every hour to
-          reflect any changes in your playlist data (new songs added, old songs
-          removed, etc.), and a new playlist will be created each month.
+          Liked Songs data to automatically create monthly playlists within your
+          Spotify account. Monthify creates two types of playlists: monthly
+          playlists, and a "Monthify 30" playlist.<br></br>
+          <br></br>
+          Monthly playlists are titled "[current month] [current year]" and are
+          created at the start of each month. As a user adds tracks to their
+          Liked Songs during a particular month, the corresponding monthly
+          playlist will be automatically updated to reflect these additions. If
+          a user removes tracks from their Liked Songs, these changes will also
+          be reflected in the monthly playlist. At the start of a new month, the
+          previous monthly playlist will stop being updated and a new monthly
+          playlist representing the new month will be created.
+          <br></br>
+          <br></br>
+          The "Monthify 30" playlist operates similarly to the monthly
+          playlists, although this is a single playlist that will continue to be
+          updated as long as a user is signed up with Monthify. Instead of
+          including the tracks that a user has added to their Liked Songs during
+          a particular month, it will do this for any tracks that a user had
+          added within the past 30 days. Thus, it is meant to provide a snapshot
+          of a user's newly liked songs for the past month at any given point in
+          time.
+          <br></br>
+          <br></br>
+          Both the monthly playlists and the "Monthify 30" playlist will update
+          multiple times per day in order to accurately reflect a user's
+          listening activity.
         </p>
         <p className={light.className}>
           The result is an automatically generated listening history neatly
