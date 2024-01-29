@@ -35,6 +35,10 @@
     text-align: center;
     line-height: 1.75;
   }
+
+  .linkText {
+    color: #1e1e1e;
+  }
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
@@ -71,6 +75,10 @@
     font-size: large;
     text-align: center;
     line-height: 1.75;
+  }
+
+  .linkText {
+    color: #1e1e1e;
   }
 }
 
@@ -109,6 +117,10 @@
     text-align: center;
     line-height: 1.75;
   }
+
+  .linkText {
+    color: #1e1e1e;
+  }
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
@@ -146,6 +158,10 @@
     text-align: center;
     line-height: 1.75;
   }
+
+  .linkText {
+    color: #1e1e1e;
+  }
 }
 
 /* Extra large devices (large laptops and desktops, 1750px and up) */
@@ -182,5 +198,9 @@
     font-size: 1.8vh;
     text-align: center;
     line-height: 1.75;
+  }
+
+  .linkText {
+    color: #1e1e1e;
   }
 }
