@@ -4,7 +4,7 @@ import querystring from 'querystring'
 import axios from 'axios'
 import { AxiosError, AxiosResponse } from 'axios'
 import cookieParser from 'cookie-parser'
-import { getUsers } from './db.js'
+import { getLastMonth, getUsers, updateLastMonth } from './db.js'
 import { ToadScheduler, SimpleIntervalJob, Task } from 'toad-scheduler'
 import { updateMonthifyPlaylists } from './utils/playlistLogic.js'
 import { RowDataPacket } from 'mysql2'
@@ -24,6 +24,7 @@ const port = parseInt(process.env.SERVER_PORT || '', 10)
 // Add cookieParser middleware to application
 app.use(cookieParser())
 
+// Bring in server routes defined in "routes" directory
 createServerRoutes(app)
 
 // Bind application to port
@@ -38,6 +39,15 @@ const scheduler = new ToadScheduler()
 
 // Define scheduled task to run
 const task = new Task('test-task', async () => {
+    // Check if it's a new month
+    const lastMonth = await getLastMonth()
+    const currentMonth = new Date().getMonth()
+    const is_new_month = lastMonth !== currentMonth
+    // If it's a new month, update last month in database
+    if (is_new_month) {
+        await updateLastMonth(currentMonth)
+    }
+
     // Iterate over each user in the database
     getUsers().then((response: RowDataPacket[]) => {
         response.forEach((user) => {
@@ -62,7 +72,11 @@ const task = new Task('test-task', async () => {
                     .then((response: AxiosResponse) => {
                         const access_token = response.data.access_token
                         // Use access token to update their Monthify playlists
-                        updateMonthifyPlaylists(spotify_id, access_token)
+                        updateMonthifyPlaylists(
+                            spotify_id,
+                            access_token,
+                            is_new_month
+                        )
                     })
                     .catch((error: AxiosError) => {
                         console.log(error)

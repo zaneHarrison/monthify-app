@@ -326,16 +326,12 @@ async function getPotentialTracks(
 // Function to update user's Monthify playlists
 export async function updateMonthifyPlaylists(
     spotify_user_id: string,
-    access_token: string
+    access_token: string,
+    is_new_month: boolean
 ) {
-    // First check if it's a new month
-    const lastMonth = await getLastMonth()
-    const currentMonth = new Date().getMonth()
-
     // If it's a new month
-    if (lastMonth !== currentMonth) {
-        // Update last month in database
-        await updateLastMonth(currentMonth)
+    if (is_new_month) {
+        console.log('New month!')
         // Create new monthly playlist for user
         await createMonthlyPlaylist(spotify_user_id, access_token)
     }

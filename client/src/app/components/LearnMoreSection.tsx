@@ -21,7 +21,8 @@ export function LearnMoreSection() {
           After signing up with the button above, Monthify will access your
           Liked Songs data to automatically create monthly playlists within your
           Spotify account. Monthify creates two types of playlists: monthly
-          playlists, and a "Monthify 30" playlist.<br></br>
+          playlists, and a "Monthify 30" playlist.
+          <br></br>
           <br></br>
           Monthly playlists are titled "[current month] [current year]" and are
           created at the start of each month. As a user adds tracks to their
@@ -45,11 +46,8 @@ export function LearnMoreSection() {
           <br></br>
           Both the monthly playlists and the "Monthify 30" playlist will update
           multiple times per day in order to accurately reflect a user's
-          listening activity.
-        </p>
-        <p className={light.className}>
-          The result is an automatically generated listening history neatly
-          captured in monthly playlists.
+          listening activity. The result is an automatically generated listening
+          history neatly captured in monthly playlists.
         </p>
       </div>
       <Button
