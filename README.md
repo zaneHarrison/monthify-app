@@ -54,7 +54,7 @@ Monthify is the first full-stack web application that I've developed on my own, 
 When starting programming projects, it's important to realize that you do not need to know how to do what you want to do when you start. Getting stuck, trying things out, and doing research to get unstuck is how you learn. Similarly, learning through acquiring new coding skills, watching YouTube videos, and reading about programming concepts is definitely a necessary component of improving as a developer, but at a certain point you need to dive into a project and try to build something. Embracing this mindset has significantly contributed to my growth as a developer.
 <br></br>
 
-## Helpful Resource
+## Helpful Resources
 
 Here is a short list of resources that I found useful when working on this project:
 * https://www.newline.co/courses/build-a-spotify-connected-app/implementing-the-authorization-code-flow
