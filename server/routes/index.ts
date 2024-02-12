@@ -16,7 +16,6 @@ dotenv.config({ path: '../config.env' })
 // Access environment variables stored in .env file
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
-const REDIRECT_URI = process.env.REDIRECT_URI
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL
 
 // Expose backend routes
@@ -38,7 +37,7 @@ export function createServerRoutes(app: Express) {
         const queryParams: string = querystring.stringify({
             client_id: CLIENT_ID,
             response_type: 'code',
-            redirect_uri: REDIRECT_URI,
+            redirect_uri: `${CLIENT_BASE_URL}/callback`,
             state: req.query.optOut ? 'optOut' : state,
             scope: scope,
             show_dialog: true,
@@ -80,7 +79,7 @@ export function createServerRoutes(app: Express) {
             data: querystring.stringify({
                 grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: REDIRECT_URI,
+                redirect_uri: `${CLIENT_BASE_URL}/callback`,
             }),
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',

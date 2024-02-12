@@ -3,8 +3,6 @@ import { AxiosError, AxiosResponse } from 'axios'
 import {
     updateUsersMonthlyPlaylistId,
     updateMonthify30Id,
-    getLastMonth,
-    updateLastMonth,
     getUserById,
 } from '../db.js'
 import fs from 'fs'
