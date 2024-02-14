@@ -1,8 +1,8 @@
-/* Extra small devices (phones, 370px and down) */
-@media only screen and (max-width: 370px) {
+/* Extra extra small devices (phones, 370px and down) */
+@media only screen and (max-width: 380px) {
   .container {
     background-color: #1e1e1e;
-    height: 80vh;
+    height: 93vh;
     width: 100vw;
     color: #ececec;
     display: flex;
@@ -21,14 +21,14 @@
   .introTextContainer {
     margin-top: 2vh;
     width: 55vw;
-    font-size: 13px;
+    font-size: 15px;
     text-align: center;
     line-height: 1.5;
   }
 }
 
-/* Extra small devices (phones, 600px and down) */
-@media only screen and (min-width: 371px) and (max-width: 600px) {
+/* Extra small devices (phones, 381px to 600px) */
+@media only screen and (min-width: 381px) and (max-width: 600px) {
   .container {
     background-color: #1e1e1e;
     height: 75vh;
@@ -50,7 +50,7 @@
   .introTextContainer {
     margin-top: 2vh;
     width: 50vw;
-    font-size: 13px;
+    font-size: 15px;
     text-align: center;
     line-height: 1.5;
   }
