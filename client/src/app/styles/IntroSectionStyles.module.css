@@ -31,7 +31,7 @@
 @media only screen and (min-width: 381px) and (max-width: 600px) {
   .container {
     background-color: #1e1e1e;
-    height: 75vh;
+    height: 90vh;
     width: 100vw;
     color: #ececec;
     display: flex;
