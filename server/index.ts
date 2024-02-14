@@ -87,5 +87,5 @@ const task = new Task('test-task', async () => {
 })
 
 // Define and add scheduled job
-const job = new SimpleIntervalJob({ seconds: 5 }, task)
+const job = new SimpleIntervalJob({ seconds: 3600 }, task)
 scheduler.addSimpleIntervalJob(job)

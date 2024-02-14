@@ -329,7 +329,9 @@ export async function updateMonthifyPlaylists(
 ) {
     // If it's a new month
     if (is_new_month) {
-        console.log('New month!')
+        console.log(
+            `New month has begun, creating new monthly playlist for user ${spotify_user_id}`
+        )
         // Create new monthly playlist for user
         await createMonthlyPlaylist(spotify_user_id, access_token)
     }
