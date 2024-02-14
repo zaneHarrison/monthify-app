@@ -1,5 +1,34 @@
+/* Extra small devices (phones, 370px and down) */
+@media only screen and (max-width: 370px) {
+  .container {
+    background-color: #1e1e1e;
+    height: 80vh;
+    width: 100vw;
+    color: #ececec;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .titleTextContainer {
+    margin-top: 12vh;
+    width: 75vw;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .introTextContainer {
+    margin-top: 2vh;
+    width: 55vw;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.5;
+  }
+}
+
 /* Extra small devices (phones, 600px and down) */
-@media only screen and (max-width: 600px) {
+@media only screen and (min-width: 600px) {
   .container {
     background-color: #1e1e1e;
     height: 75vh;
