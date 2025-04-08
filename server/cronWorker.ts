@@ -1,4 +1,3 @@
-import { ToadScheduler, SimpleIntervalJob, Task } from 'toad-scheduler'
 import { getLastMonth, getUsers, updateLastMonth } from './db.js'
 import { RowDataPacket } from 'mysql2'
 import axios from 'axios'
@@ -14,11 +13,8 @@ dotenv.config({ path: '../config.env' })
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
-// Scheduler for task
-const scheduler = new ToadScheduler()
-
-// Define scheduled task to run
-const task = new Task('test-task', async () => {
+// Define the task
+export async function runTask() {
     // Check if it's a new month
     const lastMonth = await getLastMonth()
     const currentMonth = new Date().getMonth()
@@ -64,8 +60,7 @@ const task = new Task('test-task', async () => {
             }
         })
     })
-})
+}
 
-// Define and add scheduled job
-const job = new SimpleIntervalJob({ seconds: 5 }, task)
-scheduler.addSimpleIntervalJob(job)
+// Run the task
+runTask()
