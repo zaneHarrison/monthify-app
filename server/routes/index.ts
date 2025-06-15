@@ -129,6 +129,17 @@ export function createServerRoutes(app: Express) {
                                     console.log(
                                         'User does not already exist in database, continuing with sign up'
                                     )
+
+                                    // Add user to the database
+                                    console.log(
+                                        `Adding user ${spotify_user_id} to database`
+                                    )
+                                    createUser(
+                                        spotify_display_name,
+                                        spotify_user_id,
+                                        refresh_token
+                                    )
+
                                     // Create playlists for user signing up
                                     // a) Create current month playlist
                                     console.log(
@@ -146,16 +157,6 @@ export function createServerRoutes(app: Express) {
                                     createMonthify30Playlist(
                                         spotify_user_id,
                                         access_token
-                                    )
-
-                                    // 2) Add user to database
-                                    console.log(
-                                        `Adding user ${spotify_user_id} to database`
-                                    )
-                                    createUser(
-                                        spotify_display_name,
-                                        spotify_user_id,
-                                        refresh_token
                                     )
                                 }
                             })

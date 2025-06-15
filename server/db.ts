@@ -18,7 +18,7 @@ export async function createUser(
     spotify_display_name: string,
     spotify_user_id: string,
     refresh_token: string
-) {
+): Promise<void> {
     try {
         await pool.query(
             `
@@ -32,6 +32,7 @@ export async function createUser(
         )
     } catch (error) {
         console.error('Error inserting user into database:', error)
+        throw error
     }
 }
 
