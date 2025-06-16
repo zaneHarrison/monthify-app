@@ -49,158 +49,137 @@ export function createServerRoutes(app: Express) {
     })
 
     // Callback route logic
-    app.get('/callback', (req: Request, res: Response) => {
-        // Check state equality
-        const state = (req.query.state as string) || null
-        if (state !== 'optOut' && state !== req.cookies[stateKey]) {
-            console.log(
-                'States do not match. Ending authorization flow and redirecting user to error page'
-            )
-            res.redirect(`${CLIENT_BASE_URL}/error`)
-            return
-        }
+    app.get('/callback', async (req: Request, res: Response) => {
+        try {
+            // Check state equality
+            const state = (req.query.state as string) || null
+            if (state !== 'optOut' && state !== req.cookies[stateKey]) {
+                console.log(
+                    'States do not match. Ending authorization flow and redirecting user to error page'
+                )
+                res.redirect(`${CLIENT_BASE_URL}/error`)
+                return
+            }
 
-        // Redirect user to homepage if they deny authorization
-        const error = (req.query.error as string) || undefined
-        if (error) {
-            console.log('Authorization denied. Redirecting user to homepage')
-            res.redirect(`${CLIENT_BASE_URL}`)
-            return
-        }
+            // Redirect user to homepage if they deny authorization
+            const error = (req.query.error as string) || undefined
+            if (error) {
+                console.log(
+                    'Authorization denied. Redirecting user to homepage'
+                )
+                res.redirect(`${CLIENT_BASE_URL}`)
+                return
+            }
 
-        // Extract code parameter
-        const code = (req.query.code as string) || null
+            // Extract authorization code parameter
+            const authCode = (req.query.code as string) || null
 
-        // Request access token using code parameter value
-        console.log('Retrieving access and refresh tokens')
-        axios({
-            method: 'post',
-            url: 'https://accounts.spotify.com/api/token',
-            data: querystring.stringify({
-                grant_type: 'authorization_code',
-                code: code,
-                redirect_uri: `${CLIENT_BASE_URL}/callback`,
-            }),
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-            },
-        })
-            .then((response: AxiosResponse) => {
-                if (response.status === 200) {
-                    const { refresh_token, access_token, token_type } =
-                        response.data
+            // Request access token using authorization code parameter value
+            console.log('Retrieving access and refresh tokens')
+            const tokenResponse = await axios({
+                method: 'post',
+                url: 'https://accounts.spotify.com/api/token',
+                data: querystring.stringify({
+                    grant_type: 'authorization_code',
+                    code: authCode,
+                    redirect_uri: `${CLIENT_BASE_URL}/callback`,
+                }),
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded',
+                    Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+                },
+            })
+            if (tokenResponse.status !== 200) {
+                res.send(tokenResponse)
+                return
+            }
+            const { refresh_token, access_token, token_type } =
+                tokenResponse.data
 
-                    // Fetch current user's information
-                    console.log('Fetching user spotify profile data')
-                    axios
-                        .get('https://api.spotify.com/v1/me', {
-                            headers: {
-                                Authorization: `${token_type} ${access_token}`,
-                            },
-                        })
-                        .then((response) => {
-                            const spotify_display_name =
-                                response.data.display_name
-                            const spotify_user_id = response.data.id
-
-                            // Delete user from database if they are opting out
-                            if (state === 'optOut') {
-                                console.log(
-                                    `User has chosen to opt-out, deleting user ${spotify_user_id} from database`
-                                )
-                                deleteUser(spotify_user_id)
-                                res.redirect(
-                                    `${CLIENT_BASE_URL}/opt-out-confirmation`
-                                )
-                                return
-                            }
-
-                            // Otherwise they're signing up so add user to database
-
-                            // Check if they're already in the database
-                            getUserById(spotify_user_id).then((response) => {
-                                if (response) {
-                                    console.log(
-                                        'User already signed up, terminating sign up'
-                                    )
-                                } else {
-                                    // User isn't already in the database, so add them
-                                    console.log(
-                                        'User does not already exist in database, continuing with sign up'
-                                    )
-
-                                    // Add user to the database
-                                    console.log(
-                                        `Adding user ${spotify_user_id} to database`
-                                    )
-                                    createUser(
-                                        spotify_display_name,
-                                        spotify_user_id,
-                                        refresh_token
-                                    )
-
-                                    // Create playlists for user signing up
-                                    // a) Create current month playlist
-                                    console.log(
-                                        `Creating current month's playlist for user ${spotify_user_id}`
-                                    )
-                                    createMonthlyPlaylist(
-                                        spotify_user_id,
-                                        access_token
-                                    )
-
-                                    // b) Create Monthify 30 playlist
-                                    console.log(
-                                        `Creating Monthify 30 playlist for user ${spotify_user_id}`
-                                    )
-                                    createMonthify30Playlist(
-                                        spotify_user_id,
-                                        access_token
-                                    )
-                                }
-                            })
-
-                            // Redirect user to signed up confirmation page
-                            res.redirect(`${CLIENT_BASE_URL}/sign-up`)
-                        })
-                        .catch((error) => {
-                            res.send(error)
-                        })
-                } else {
-                    res.send(response)
+            // Fetch current user's information
+            console.log('Fetching user spotify profile data')
+            const spotifyProfileResponse = await axios.get(
+                'https://api.spotify.com/v1/me',
+                {
+                    headers: {
+                        Authorization: `${token_type} ${access_token}`,
+                    },
                 }
-            })
-            .catch((error: AxiosError) => {
-                res.send(error)
-            })
+            )
+            const spotify_display_name =
+                spotifyProfileResponse.data.display_name
+            const spotify_user_id = spotifyProfileResponse.data.id
+
+            // Delete user from database if they are opting out
+            if (state === 'optOut') {
+                console.log(
+                    `User has chosen to opt-out, deleting user ${spotify_user_id} from database`
+                )
+                deleteUser(spotify_user_id)
+                res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`)
+                return
+            }
+
+            // Otherwise they're signing up so add user to database
+            // Check if they're already in the database
+            const existingUser = await getUserById(spotify_user_id)
+            if (existingUser) {
+                console.log('User already signed up, terminating sign up')
+            } else {
+                // User isn't already in the database, so add them
+                console.log(
+                    'User does not already exist in database, continuing with sign up'
+                )
+                // Add user to the database
+                console.log(`Adding user ${spotify_user_id} to database`)
+                await createUser(
+                    spotify_display_name,
+                    spotify_user_id,
+                    refresh_token
+                )
+                // Create playlists for user signing up
+                console.log(
+                    `Creating current month's playlist for user ${spotify_user_id}`
+                )
+                createMonthlyPlaylist(spotify_user_id, access_token)
+                console.log(
+                    `Creating Monthify 30 playlist for user ${spotify_user_id}`
+                )
+                createMonthify30Playlist(spotify_user_id, access_token)
+            }
+            // Redirect user to signed up confirmation page
+            res.redirect(`${CLIENT_BASE_URL}/sign-up`)
+        } catch (error) {
+            console.error('Error in /callback route:', error)
+            res.send(error)
+        }
     })
 
     // Refresh token route
-    app.get('/refresh_token', (req: Request, res: Response) => {
+    app.get('/refresh_token', async (req: Request, res: Response) => {
         const refresh_token: string | undefined =
             typeof req.query.refresh_token === 'string'
                 ? req.query.refresh_token
                 : undefined
 
         console.log('Retrieving new access token')
-        axios({
-            method: 'post',
-            url: 'https://accounts.spotify.com/api/token',
-            data: querystring.stringify({
-                grant_type: 'refresh_token',
-                refresh_token: refresh_token,
-            }),
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-            },
-        })
-            .then((response: AxiosResponse) => {
-                res.send(response.data)
+        try {
+            const refreshTokenResponse = await axios({
+                method: 'post',
+                url: 'https://accounts.spotify.com/api/token',
+                data: querystring.stringify({
+                    grant_type: 'refresh_token',
+                    refresh_token: refresh_token,
+                }),
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded',
+                    Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+                },
             })
-            .catch((error: AxiosError) => {
-                res.send(error)
-            })
+            res.send(refreshTokenResponse.data)
+        } catch (error) {
+            console.log('Error retrieving a new access token')
+            res.send(error)
+        }
     })
 }
