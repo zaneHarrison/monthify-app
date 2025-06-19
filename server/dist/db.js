@@ -21,6 +21,7 @@ export async function createUser(spotify_display_name, spotify_user_id, refresh_
     }
     catch (error) {
         console.error('Error inserting user into database:', error);
+        throw error;
     }
 }
 // Retrieve a list of all users

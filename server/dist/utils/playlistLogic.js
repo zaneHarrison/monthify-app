@@ -11,58 +11,63 @@ export async function createMonthlyPlaylist(spotify_user_id, access_token) {
     });
     const current_year = current_date.getFullYear();
     const playlist_name = `${current_month} ${current_year}`;
-    // Create playlist via API call
-    axios
-        .post(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists`, {
-        name: playlist_name,
-        description: `An automatically generated collection of tracks you've liked in ${current_month} of ${current_year}`,
-        public: false,
-    }, {
-        headers: {
-            Authorization: `Bearer ${access_token}`,
-            'Content-Type': 'application/json',
-        },
-    })
-        .then((response) => {
+    try {
+        // Create playlist via API call
+        const createMonthlyPlaylistResponse = await axios.post(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists`, {
+            name: playlist_name,
+            description: `An automatically generated collection of tracks you've liked in ${current_month} of ${current_year}`,
+            public: false,
+        }, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+                'Content-Type': 'application/json',
+            },
+        });
         console.log(`Successfully created '${playlist_name}' playlist for user ${spotify_user_id}`);
         // Store playlist ID in database
-        const monthly_playlist_id = response.data.id;
+        const monthly_playlist_id = createMonthlyPlaylistResponse.data.id;
         updateUsersMonthlyPlaylistId(spotify_user_id, monthly_playlist_id);
-        return response.data.id;
-    })
-        .catch((error) => {
-        console.log(`Error: ${error}`);
-    });
-    return;
+        return monthly_playlist_id;
+    }
+    catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('API error:', error.response?.data || error.message);
+        }
+        else {
+            console.error('Unexpected error:', error);
+        }
+    }
 }
 // API call to create the Monthify 30 playlist for a particular user
 export async function createMonthify30Playlist(spotify_user_id, access_token) {
-    // Create playlist via API call
-    await axios
-        .post(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists`, {
-        name: 'Monthify 30',
-        description: "An automatically generated collection of tracks you've liked in the past 30 days",
-        public: false,
-    }, {
-        headers: {
-            Authorization: `Bearer ${access_token}`,
-            'Content-Type': 'application/json',
-        },
-    })
-        .then((response) => {
+    try {
+        const createMonthify30PlaylistResponse = await axios.post(`https://api.spotify.com/v1/users/${spotify_user_id}/playlists`, {
+            name: 'Monthify 30',
+            description: "An automatically generated collection of tracks you've liked in the past 30 days",
+            public: false,
+        }, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+                'Content-Type': 'application/json',
+            },
+        });
         console.log(`Successfully created 'Monthify 30' playlist for user ${spotify_user_id}`);
         // Store playlist ID in database
-        const monthify_30_id = response.data.id;
+        const monthify_30_id = createMonthify30PlaylistResponse.data.id;
         updateMonthify30Id(spotify_user_id, monthify_30_id);
         // Add playlist image for Monthify 30 playlist
         const base64Encoding = fs.readFileSync('./public/monthify30CoverImage.txt', 'utf-8');
         updatePlaylistImage(base64Encoding, monthify_30_id, access_token);
-        return response.data.id;
-    })
-        .catch((error) => {
-        console.log(`Error: ${error}`);
-    });
-    return;
+        return monthify_30_id;
+    }
+    catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('API error:', error.response?.data || error.message);
+        }
+        else {
+            console.error('Unexpected error:', error);
+        }
+    }
 }
 export async function updatePlaylistImage(base64Encoding, playlist_id, access_token) {
     try {
