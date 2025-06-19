@@ -77,7 +77,7 @@ export async function createMonthlyPlaylist(
         )
         // Store playlist ID in database
         const monthly_playlist_id = createMonthlyPlaylistResponse.data.id
-        updateUsersMonthlyPlaylistId(spotify_user_id, monthly_playlist_id)
+        await updateUsersMonthlyPlaylistId(spotify_user_id, monthly_playlist_id)
 
         return monthly_playlist_id
     } catch (error) {
@@ -115,7 +115,7 @@ export async function createMonthify30Playlist(
         )
         // Store playlist ID in database
         const monthify_30_id = createMonthify30PlaylistResponse.data.id
-        updateMonthify30Id(spotify_user_id, monthify_30_id)
+        await updateMonthify30Id(spotify_user_id, monthify_30_id)
 
         // Add playlist image for Monthify 30 playlist
         const base64Encoding = fs.readFileSync(
@@ -293,25 +293,8 @@ async function getPotentialTracks(
     // Get user's information
     const user = await getUserById(spotify_user_id)
     if (user) {
-        // Create set of tracks for monthly playlist
-        // let monthly_playlist_tracks: Set<string> = new Set()
-
-        // Get list of user's playlists
-        // const playlists: string[] = await getPlaylists(
-        //     spotify_user_id,
-        //     access_token
-        // )
-
         // Create set of potential tracks to add
         let tracks: Set<Track> = new Set()
-        // Populate set of potential tracks to add using playlists
-        // for (const playlist_id of playlists) {
-        //     const playlistTracks = await getTracksFromPlaylist(
-        //         access_token,
-        //         playlist_id
-        //     )
-        //     tracks = new Set([...tracks, ...playlistTracks])
-        // }
 
         // Add user's liked songs to set of potential tracks to add
         const likedSongs = await getLikedSongs(access_token, spotify_user_id)
@@ -376,13 +359,35 @@ export async function updateMonthifyPlaylists(
         const monthify_30_id = user.monthify_30_id
 
         // Update monthly playlist
-        updateSpotifyPlaylist(
-            access_token,
-            monthly_playlist_id,
-            monthly_playlist_tracks
-        )
+        try {
+            await updateSpotifyPlaylist(
+                access_token,
+                monthly_playlist_id,
+                monthly_playlist_tracks
+            )
+            console.log(
+                `Successfully updated monthly playlist for user: ${user.spotify_display_name}`
+            )
+        } catch {
+            console.error(
+                `Failed to update monthly playlist for user: ${user.spotify_display_name}`
+            )
+        }
         // Update Monthify 30 playlist
-        updateSpotifyPlaylist(access_token, monthify_30_id, monthify_30_tracks)
+        try {
+            await updateSpotifyPlaylist(
+                access_token,
+                monthify_30_id,
+                monthify_30_tracks
+            )
+            console.log(
+                `Successfully updated Monthify 30 playlist for user: ${user.spotify_display_name}`
+            )
+        } catch {
+            console.error(
+                `Failed to update Monthify 30 playlist for user: ${user.spotify_display_name}`
+            )
+        }
     }
 }
 
@@ -475,8 +480,8 @@ export async function updateSpotifyPlaylist(
                 },
             }
         )
-        console.log('Playlist updated successfully')
     } catch (error) {
         console.log(`Error updating playlist: ${error}`)
+        throw error
     }
 }

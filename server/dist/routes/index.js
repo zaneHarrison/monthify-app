@@ -16,6 +16,7 @@ export function createServerRoutes(app) {
     const stateKey = 'spotify_auth_state';
     // Route for user sign up
     app.get('/login', (req, res) => {
+        console.log(`[BACKEND] Prompting user to authorize access to Spotify account`);
         // Generate state value and store in cookie
         const state = generateRandomString(16);
         res.cookie(stateKey, state);

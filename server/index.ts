@@ -2,6 +2,7 @@ import express, { Express } from 'express'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import { createServerRoutes } from './routes/index.js'
+import { runTask } from './cronWorker.js'
 
 // Enable the use of environment variables
 dotenv.config({ path: '../config.env' })
@@ -23,3 +24,5 @@ createServerRoutes(app)
 app.listen(port, () => {
     console.log(`Server started on port ${port}`)
 })
+
+runTask()

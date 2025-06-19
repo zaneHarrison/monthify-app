@@ -1,9 +1,7 @@
 import { getLastMonth, getUsers, updateLastMonth } from './db.js'
-import { RowDataPacket } from 'mysql2'
 import axios from 'axios'
 import querystring from 'querystring'
 import dotenv from 'dotenv'
-import { AxiosError, AxiosResponse } from 'axios'
 import { updateMonthifyPlaylists } from './utils/playlistLogic.js'
 
 // Enable the use of environment variables
@@ -69,4 +67,4 @@ export async function runTask() {
 }
 
 // Run the task
-runTask()
+// runTask()

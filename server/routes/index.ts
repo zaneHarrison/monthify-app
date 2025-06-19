@@ -3,7 +3,6 @@ import dotenv from 'dotenv'
 import { generateRandomString } from '../utils/helperFunctions.js'
 import querystring from 'querystring'
 import axios from 'axios'
-import { AxiosError, AxiosResponse } from 'axios'
 import { createUser, getUserById, deleteUser } from '../db.js'
 import {
     createMonthify30Playlist,

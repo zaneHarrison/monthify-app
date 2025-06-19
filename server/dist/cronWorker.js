@@ -23,6 +23,7 @@ export async function runTask() {
     await Promise.all(users
         .filter((user) => user.spotify_display_name === 'zane.harrison')
         .map(async (user) => {
+        console.log('HERE');
         try {
             const accessTokenResponse = await axios({
                 method: 'post',
