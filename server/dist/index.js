@@ -12,10 +12,6 @@ const app = express();
 const port = parseInt(SERVER_PORT || '', 10);
 // Add cookieParser middleware to application
 app.use(cookieParser());
-app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
-    next();
-});
 // Bring in server routes defined in "routes" directory
 createServerRoutes(app);
 // Bind application to port

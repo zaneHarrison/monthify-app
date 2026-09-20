@@ -60,7 +60,7 @@ export function LearnMoreSection() {
         target="_self"
         className="learnMoreButton"
         text="Opt-Out of Monthify"
-        link="/login?optOut=true"
+        link="/opt-out"
       />
       <div id="created-by-text" className={styles.createdByTextContainer}>
         <p className={light.className}>

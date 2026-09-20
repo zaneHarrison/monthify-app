@@ -8,8 +8,8 @@ module.exports = () => {
   const rewrites = () => {
     return [
       {
-        source: "/login",
-        destination: `${SERVER_BASE_URL}/login`,
+        source: "/sign-up",
+        destination: `${SERVER_BASE_URL}/sign-up`,
       },
       {
         source: "/callback",

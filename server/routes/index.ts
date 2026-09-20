@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express'
 import dotenv from 'dotenv'
-import { generateRandomString } from '../utils/helperFunctions.js'
+import { randomBytes } from 'crypto'
 import querystring from 'querystring'
 import axios from 'axios'
 import { createUser, getUserById, deleteUser } from '../db.js'
@@ -17,48 +17,73 @@ const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL
 
+// Name of the cookie used to track the state value of an authorization request
+const stateKey = 'spotify_auth_state'
+
+type AuthIntent = 'signUp' | 'optOut'
+
+// Redirect user to Spotify's authorization page. The intent is prefixed onto a
+// random state value, which is stored in a cookie so the callback can verify it
+function redirectToSpotifyAuth(
+    res: Response,
+    intent: AuthIntent,
+    scope?: string
+) {
+    // Generate state value and store in cookie
+    const state = `${intent}.${randomBytes(16).toString('base64url')}`
+    res.cookie(stateKey, state)
+
+    // Build query string
+    const queryParams: string = querystring.stringify({
+        client_id: CLIENT_ID,
+        response_type: 'code',
+        redirect_uri: `${CLIENT_BASE_URL}/callback`,
+        state: state,
+        // Omit scope entirely if none is requested
+        ...(scope && { scope: scope }),
+        show_dialog: true,
+    })
+
+    // Request authorization
+    console.log(
+        `Prompting user to authorize access to Spotify account (${intent})`
+    )
+    res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`)
+}
+
 // Expose backend routes
 export function createServerRoutes(app: Express) {
-    // Use variable to track state
-    const stateKey = 'spotify_auth_state'
-
     // Route for user sign up
-    app.get('/login', (req: Request, res: Response) => {
-        // Generate state value and store in cookie
-        const state = generateRandomString(16)
-        res.cookie(stateKey, state)
-
+    app.get('/sign-up', (req: Request, res: Response) => {
         // Define authorized access levels for application
         const scope =
             'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-private user-read-email user-library-read ugc-image-upload'
 
-        // Build query string
-        const queryParams: string = querystring.stringify({
-            client_id: CLIENT_ID,
-            response_type: 'code',
-            redirect_uri: `${CLIENT_BASE_URL}/callback`,
-            state: req.query.optOut ? 'optOut' : state,
-            scope: scope,
-            show_dialog: true,
-        })
+        redirectToSpotifyAuth(res, 'signUp', scope)
+    })
 
-        // Request authorization
-        console.log('Prompting user to authorize access to Spotify account')
-        res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`)
+    // Route for user opt out
+    app.get('/opt-out', (req: Request, res: Response) => {
+        redirectToSpotifyAuth(res, 'optOut')
     })
 
     // Callback route logic
     app.get('/callback', async (req: Request, res: Response) => {
         try {
-            // Check state equality
+            // Check that state matches the value stored in the cookie
             const state = (req.query.state as string) || null
-            if (state !== 'optOut' && state !== req.cookies[stateKey]) {
+            if (!state || state !== req.cookies[stateKey]) {
                 console.log(
                     'States do not match. Ending authorization flow and redirecting user to error page'
                 )
                 res.redirect(`${CLIENT_BASE_URL}/error`)
                 return
             }
+            // State is single-use, so clear it and determine the user's intent
+            res.clearCookie(stateKey)
+            const intent: AuthIntent = state.startsWith('optOut.')
+                ? 'optOut'
+                : 'signUp'
 
             // Redirect user to homepage if they deny authorization
             const error = (req.query.error as string) || undefined
@@ -110,11 +135,16 @@ export function createServerRoutes(app: Express) {
             const spotify_user_id = spotifyProfileResponse.data.id
 
             // Delete user from database if they are opting out
-            if (state === 'optOut') {
+            if (intent === 'optOut') {
                 console.log(
                     `User has chosen to opt-out, deleting user ${spotify_user_id} from database`
                 )
-                deleteUser(spotify_user_id)
+                try {
+                    await deleteUser(spotify_user_id)
+                } catch {
+                    res.redirect(`${CLIENT_BASE_URL}/error`)
+                    return
+                }
                 res.redirect(`${CLIENT_BASE_URL}/opt-out-confirmation`)
                 return
             }
@@ -147,7 +177,7 @@ export function createServerRoutes(app: Express) {
                 createMonthify30Playlist(spotify_user_id, access_token)
             }
             // Redirect user to signed up confirmation page
-            res.redirect(`${CLIENT_BASE_URL}/sign-up`)
+            res.redirect(`${CLIENT_BASE_URL}/signed-up`)
         } catch (error) {
             console.error('Error in /callback route:', error)
             res.send(error)

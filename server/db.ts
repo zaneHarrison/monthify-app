@@ -82,6 +82,7 @@ export async function deleteUser(spotify_user_id: string) {
             `Error deleting user with username ${spotify_user_id} from database:`,
             error
         )
+        throw error
     }
 }
 
