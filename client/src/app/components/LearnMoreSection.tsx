@@ -51,16 +51,16 @@ export function LearnMoreSection() {
         </p>
       </div>
       <Button
-        target="_blank"
-        className="learnMoreButton"
-        text="View Code On GitHub"
-        link="https://github.com/zaneHarrison/monthify-app/tree/main"
-      />
-      <Button
         target="_self"
         className="learnMoreButton"
         text="Opt-Out of Monthify"
         link="/opt-out"
+      />
+      <Button
+        target="_blank"
+        className="learnMoreButton"
+        text="View Code On GitHub"
+        link="https://github.com/zaneHarrison/monthify-app/tree/main"
       />
       <div id="created-by-text" className={styles.createdByTextContainer}>
         <p className={light.className}>
