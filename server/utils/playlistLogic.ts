@@ -457,6 +457,9 @@ export async function getLikedSongs(
     return tracks
 }
 
+// Spotify accepts at most 100 items per request to the playlist items endpoints
+const MAX_ITEMS_PER_REQUEST = 100
+
 // Function to update the contents of a playlist
 export async function updateSpotifyPlaylist(
     access_token: string,
@@ -464,22 +467,34 @@ export async function updateSpotifyPlaylist(
     trackUris: string[]
 ) {
     // Define request endpoint
-    const endpoint: string = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`
+    const endpoint: string = `https://api.spotify.com/v1/playlists/${playlist_id}/items`
+    const config = {
+        headers: {
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/json',
+        },
+    }
 
-    // API call to update playlist
+    // API calls to update playlist
     try {
+        // Replace playlist contents with the first batch of tracks
         await axios.put(
             endpoint,
-            {
-                uris: trackUris,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                    'Content-Type': 'application/json',
-                },
-            }
+            { uris: trackUris.slice(0, MAX_ITEMS_PER_REQUEST) },
+            config
         )
+        // Append any remaining tracks, one batch at a time to preserve order
+        for (
+            let i = MAX_ITEMS_PER_REQUEST;
+            i < trackUris.length;
+            i += MAX_ITEMS_PER_REQUEST
+        ) {
+            await axios.post(
+                endpoint,
+                { uris: trackUris.slice(i, i + MAX_ITEMS_PER_REQUEST) },
+                config
+            )
+        }
     } catch (error) {
         console.log(`Error updating playlist: ${error}`)
         throw error
