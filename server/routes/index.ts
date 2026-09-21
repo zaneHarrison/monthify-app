@@ -183,32 +183,4 @@ export function createServerRoutes(app: Express) {
             res.send(error)
         }
     })
-
-    // Refresh token route
-    app.get('/refresh_token', async (req: Request, res: Response) => {
-        const refresh_token: string | undefined =
-            typeof req.query.refresh_token === 'string'
-                ? req.query.refresh_token
-                : undefined
-
-        console.log('Retrieving new access token')
-        try {
-            const refreshTokenResponse = await axios({
-                method: 'post',
-                url: 'https://accounts.spotify.com/api/token',
-                data: querystring.stringify({
-                    grant_type: 'refresh_token',
-                    refresh_token: refresh_token,
-                }),
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded',
-                    Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-                },
-            })
-            res.send(refreshTokenResponse.data)
-        } catch (error) {
-            console.log('Error retrieving a new access token')
-            res.send(error)
-        }
-    })
 }

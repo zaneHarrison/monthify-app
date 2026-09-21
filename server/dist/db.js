@@ -60,7 +60,6 @@ export async function deleteUser(spotify_user_id) {
     }
     catch (error) {
         console.error(`Error deleting user with username ${spotify_user_id} from database:`, error);
-        // Let the caller know the delete failed
         throw error;
     }
 }

@@ -40,8 +40,7 @@ export function createServerRoutes(app) {
         const scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-private user-read-email user-library-read ugc-image-upload';
         redirectToSpotifyAuth(res, 'signUp', scope);
     });
-    // Route for user opt out. No scope is requested since the user only needs
-    // to authenticate so we know which user to remove
+    // Route for user opt out
     app.get('/opt-out', (req, res) => {
         redirectToSpotifyAuth(res, 'optOut');
     });
@@ -105,7 +104,6 @@ export function createServerRoutes(app) {
                     await deleteUser(spotify_user_id);
                 }
                 catch {
-                    // deleteUser has already logged the error
                     res.redirect(`${CLIENT_BASE_URL}/error`);
                     return;
                 }
@@ -135,32 +133,6 @@ export function createServerRoutes(app) {
         }
         catch (error) {
             console.error('Error in /callback route:', error);
-            res.send(error);
-        }
-    });
-    // Refresh token route
-    app.get('/refresh_token', async (req, res) => {
-        const refresh_token = typeof req.query.refresh_token === 'string'
-            ? req.query.refresh_token
-            : undefined;
-        console.log('Retrieving new access token');
-        try {
-            const refreshTokenResponse = await axios({
-                method: 'post',
-                url: 'https://accounts.spotify.com/api/token',
-                data: querystring.stringify({
-                    grant_type: 'refresh_token',
-                    refresh_token: refresh_token,
-                }),
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded',
-                    Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-                },
-            });
-            res.send(refreshTokenResponse.data);
-        }
-        catch (error) {
-            console.log('Error retrieving a new access token');
             res.send(error);
         }
     });

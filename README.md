@@ -38,7 +38,7 @@ The top-level "client" directory contains the code related to the Next.js fronte
 
 Within the "server" directory, the "index.ts" file creates the Express application and binds the application to a port defined in the .env file. This file also imports the server routes created in an "index.ts" file within a "routes" directory and defines a scheduled task which will be run in order to update the users' playlists. 
 
-As previously mentioned, the "routes" directory contains an "index.ts" file which defines the server routes. These include a /sign-up, /opt-out, /callback, and /refresh_token route.
+As previously mentioned, the "routes" directory contains an "index.ts" file which defines the server routes. These include a /sign-up, /opt-out, and /callback route.
 
 The "utils" directory contains a "playlistLogic.ts" file which includes the logic for creating and updating the users' playlists. Code within this file is called from the scheduled task in the "index.ts" server file. 
 
