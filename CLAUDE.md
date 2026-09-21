@@ -19,6 +19,10 @@ Run these from inside `client/` or `server/`, since both load `../config.env` re
 - `server/cronWorker.ts` (`runTask`) refreshes each user's Spotify token and calls `updateMonthifyPlaylists` in `server/utils/playlistLogic.ts`, which rewrites both playlists from the user's Liked Songs. There is currently no scheduler.
 - All database access is in `server/db.ts`. The schema isn't in the repo: `users` and `month` tables.
 
+## Spotify data safety
+
+Never overwrite, add to, remove from, or otherwise edit a user's Liked Songs. Access to them is strictly read-only, with no exceptions, so no `PUT` or `DELETE` calls against `/me/tracks`.
+
 ## Code conventions
 
 Add comments in the code when necessary, but keep them brief. Avoid multi-sentence comments within the code.
