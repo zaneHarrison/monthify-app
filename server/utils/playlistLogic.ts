@@ -52,8 +52,9 @@ export async function createMonthlyPlaylist(
     // Construct playlist name
     const current_month = current_date.toLocaleString('default', {
         month: 'long',
+        timeZone: 'UTC',
     })
-    const current_year = current_date.getFullYear()
+    const current_year = current_date.getUTCFullYear()
     const playlist_name = `${current_month} ${current_year}`
 
     try {

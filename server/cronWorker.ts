@@ -15,7 +15,7 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET
 export async function runTask() {
     // Check if it's a new month
     const lastMonth = await getLastMonth()
-    const currentMonth = new Date().getMonth()
+    const currentMonth = new Date().getUTCMonth()
     const is_new_month = lastMonth !== currentMonth
     // If it's a new month, update last month in database
     if (is_new_month) {
