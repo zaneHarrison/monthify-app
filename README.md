@@ -44,7 +44,7 @@ The "utils" directory contains a "playlistLogic.ts" file which includes the logi
 
 A "db.ts" file serves as the database connection file and includes the logic for creating and updating user information in the database.
 
-The MySQL database contains two tables, "users" and "month". The "users" table stores user information, and the "month" table simply stores the last recorded month so as to allow the application to know whether a new month has begun.
+The MySQL database contains a single "users" table, which stores user information. Each user's row tracks the year and month their current monthly playlist was created for, which lets the application detect a new month on a per-user basis and retry playlist creation if it previously failed.
 <br></br>
 
 ## Final Thoughts
