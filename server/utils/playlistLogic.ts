@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { AxiosError, AxiosResponse } from 'axios'
 import {
-    updateUsersMonthlyPlaylistId,
+    updateUsersMonthlyPlaylist,
     updateMonthify30Id,
     getUserById,
 } from '../db.js'
@@ -45,17 +45,15 @@ interface Track {
 // API call to create the monthly playlist for a particular user
 export async function createMonthlyPlaylist(
     spotify_user_id: string,
-    access_token: string
+    access_token: string,
+    current_year: number,
+    current_month: number
 ) {
-    // Get current date
-    const current_date = new Date()
     // Construct playlist name
-    const current_month = current_date.toLocaleString('default', {
-        month: 'long',
-        timeZone: 'UTC',
-    })
-    const current_year = current_date.getUTCFullYear()
-    const playlist_name = `${current_month} ${current_year}`
+    const month_name = new Date(
+        Date.UTC(current_year, current_month)
+    ).toLocaleString('default', { month: 'long', timeZone: 'UTC' })
+    const playlist_name = `${month_name} ${current_year}`
 
     try {
         // Create playlist via API call
@@ -63,7 +61,7 @@ export async function createMonthlyPlaylist(
             `https://api.spotify.com/v1/users/${spotify_user_id}/playlists`,
             {
                 name: playlist_name,
-                description: `An automatically generated collection of tracks you've liked in ${current_month} of ${current_year}`,
+                description: `An automatically generated collection of tracks you've liked in ${month_name} of ${current_year}`,
                 public: false,
             },
             {
@@ -76,9 +74,14 @@ export async function createMonthlyPlaylist(
         console.log(
             `Successfully created '${playlist_name}' playlist for user ${spotify_user_id}`
         )
-        // Store playlist ID in database
+        // Store playlist ID, along with the year/month it was created for
         const monthly_playlist_id = createMonthlyPlaylistResponse.data.id
-        await updateUsersMonthlyPlaylistId(spotify_user_id, monthly_playlist_id)
+        await updateUsersMonthlyPlaylist(
+            spotify_user_id,
+            monthly_playlist_id,
+            current_year,
+            current_month
+        )
 
         return monthly_playlist_id
     } catch (error) {
@@ -87,6 +90,7 @@ export async function createMonthlyPlaylist(
         } else {
             console.error('Unexpected error:', error)
         }
+        throw error
     }
 }
 
@@ -310,15 +314,37 @@ async function getPotentialTracks(
 export async function updateMonthifyPlaylists(
     spotify_user_id: string,
     access_token: string,
-    is_new_month: boolean
+    current_year: number,
+    current_month: number
 ) {
-    // If it's a new month
-    if (is_new_month) {
+    const user = await getUserById(spotify_user_id)
+    if (!user) return
+
+    const needs_new_monthly_playlist =
+        user.monthly_playlist_year !== current_year ||
+        user.monthly_playlist_month !== current_month
+
+    let monthly_playlist_id = user.monthly_playlist_id
+    // Tracks if creation was needed but failed to prevent overwriting the stale playlist with this month's tracks
+    let skip_monthly_update = false
+
+    if (needs_new_monthly_playlist) {
         console.log(
             `New month has begun, creating new monthly playlist for user ${spotify_user_id}`
         )
-        // Create new monthly playlist for user
-        await createMonthlyPlaylist(spotify_user_id, access_token)
+        try {
+            monthly_playlist_id = await createMonthlyPlaylist(
+                spotify_user_id,
+                access_token,
+                current_year,
+                current_month
+            )
+        } catch {
+            console.error(
+                `Failed to create monthly playlist for user ${spotify_user_id}, will retry next run`
+            )
+            skip_monthly_update = true
+        }
     }
 
     // Get potential songs for montly playlist and Monthify 30 playlist
@@ -332,9 +358,12 @@ export async function updateMonthifyPlaylists(
     // Set to hold Monthify 30 tracks
     const monthify_30_tracks_set: Set<string> = new Set()
 
+    const current_date = new Date(
+        Date.UTC(current_year, current_month)
+    ).toISOString()
+
     // Populate monthly playlist and Monthify 30 playlist
     potentialTracks.forEach((track: Track) => {
-        const current_date = new Date().toISOString()
         // Get track's date added, set to old value if null
         const date_added: string =
             track.added_at !== null ? track.added_at : '2000-01-01T00:00:00Z'
@@ -353,13 +382,8 @@ export async function updateMonthifyPlaylists(
     const monthly_playlist_tracks = Array.from(monthly_playlist_tracks_set)
     const monthify_30_tracks = Array.from(monthify_30_tracks_set)
 
-    // Get user's monthly playlist and Monthify 30 playlist ids
-    const user = await getUserById(spotify_user_id)
-    if (user) {
-        const monthly_playlist_id = user.monthly_playlist_id
-        const monthify_30_id = user.monthify_30_id
-
-        // Update monthly playlist
+    // Update monthly playlist, unless creating a new one failed above
+    if (!skip_monthly_update) {
         try {
             await updateSpotifyPlaylist(
                 access_token,
@@ -374,21 +398,21 @@ export async function updateMonthifyPlaylists(
                 `Failed to update monthly playlist for user: ${user.spotify_display_name}`
             )
         }
-        // Update Monthify 30 playlist
-        try {
-            await updateSpotifyPlaylist(
-                access_token,
-                monthify_30_id,
-                monthify_30_tracks
-            )
-            console.log(
-                `Successfully updated Monthify 30 playlist for user: ${user.spotify_display_name}`
-            )
-        } catch {
-            console.error(
-                `Failed to update Monthify 30 playlist for user: ${user.spotify_display_name}`
-            )
-        }
+    }
+    // Update Monthify 30 playlist
+    try {
+        await updateSpotifyPlaylist(
+            access_token,
+            user.monthify_30_id,
+            monthify_30_tracks
+        )
+        console.log(
+            `Successfully updated Monthify 30 playlist for user: ${user.spotify_display_name}`
+        )
+    } catch {
+        console.error(
+            `Failed to update Monthify 30 playlist for user: ${user.spotify_display_name}`
+        )
     }
 }
 

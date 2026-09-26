@@ -1,4 +1,4 @@
-import { getLastMonth, getUsers, updateLastMonth } from './db.js'
+import { getUsers } from './db.js'
 import axios from 'axios'
 import querystring from 'querystring'
 import dotenv from 'dotenv'
@@ -13,14 +13,10 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET
 
 // Define the task
 export async function runTask() {
-    // Check if it's a new month
-    const lastMonth = await getLastMonth()
-    const currentMonth = new Date().getUTCMonth()
-    const is_new_month = lastMonth !== currentMonth
-    // If it's a new month, update last month in database
-    if (is_new_month) {
-        await updateLastMonth(currentMonth)
-    }
+    // Shared "now" for this run, in UTC, passed to each user's playlist update
+    const now = new Date()
+    const current_year = now.getUTCFullYear()
+    const current_month = now.getUTCMonth()
 
     // Iterate over each user in the database
     const users = await getUsers()
@@ -48,7 +44,8 @@ export async function runTask() {
                         await updateMonthifyPlaylists(
                             user.spotify_user_id,
                             access_token,
-                            is_new_month
+                            current_year,
+                            current_month
                         )
                     } catch (error) {
                         console.error(
